@@ -8,7 +8,7 @@ A single-file, browser-based tool for visualising multiple sediment core or bore
 
 *by PLF*
 
-Citation: [![DOI](https://zenodo.org/badge/1255898104.svg)](https://doi.org/10.5281/zenodo.20487141)
+[![DOI](https://zenodo.org/badge/1255898104.svg)](https://doi.org/10.5281/zenodo.20487141)
 
 ---
 
