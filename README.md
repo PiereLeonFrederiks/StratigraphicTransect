@@ -4,6 +4,8 @@
 
 A single-file, browser-based tool for visualising multiple sediment core or borehole profiles as a georeferenced stratigraphic transect. Designed as a companion to the **Geoarchaeological Core Logger**, it imports JSON or TXT exports directly and renders a publication-ready cross-section.
 
+To the application: https://piereleonfrederiks.github.io/StratigraphicTransect/
+
 ⚠ Early Access — This project is under active development. Features, exports, and data formats may change between versions. If you use this tool, I'd love to hear what works, what doesn't, and what's missing.
 
 *by PLF*
