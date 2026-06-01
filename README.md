@@ -2,9 +2,9 @@
 ### Core Logger Addon
 
 
-
-A single-file, browser-based tool for visualising multiple sediment core or borehole profiles as a georeferenced stratigraphic transect. Designed as a companion to the **Geoarchaeological Core Logger**, it imports JSON or TXT exports directly and renders a publication-ready cross-section.
 *by PLF*
+A single-file, browser-based tool for visualising multiple sediment core or borehole profiles as a georeferenced stratigraphic transect. Designed as a companion to the **Geoarchaeological Core Logger**, it imports JSON or TXT exports directly and renders a publication-ready cross-section.
+
 ---
 
 ## Features
