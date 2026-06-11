@@ -495,6 +495,160 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 /* canvas highlight ring when correlation mode is active */
 #transectCanvas.corr-mode { cursor: crosshair; outline: 2px solid var(--accent); outline-offset: -2px; }
 
+/* ── Correlation color picker row ── */
+.corr-color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 6px 9px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+.corr-color-row label {
+  font-family: var(--ga-mono);
+  font-size: .65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  flex: 1;
+}
+.corr-color-preview {
+  width: 22px; height: 22px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.corr-color-preview input[type="color"] {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+/* ── Correlation connection color edit ── */
+.corr-conn-item .corr-conn-swatch {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 14px; height: 14px;
+  border-radius: 2px;
+}
+.corr-conn-item .corr-conn-swatch input[type="color"] {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+/* ── Layer color editor modal ── */
+.layer-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.layer-editor-modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0;
+  width: 320px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 40px rgba(0,0,0,.35);
+}
+.layer-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.layer-editor-title {
+  font-family: var(--ga-mono);
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.layer-editor-close {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 1rem; padding: 0 3px; transition: color .12s; line-height: 1;
+}
+.layer-editor-close:hover { color: var(--danger); }
+.layer-editor-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.layer-editor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: var(--ga-mono);
+  font-size: .65rem;
+  color: var(--muted);
+}
+.layer-editor-swatch {
+  width: 20px; height: 20px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.layer-editor-swatch input[type="color"] {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.layer-editor-info { flex: 1; min-width: 0; }
+.layer-editor-depth { color: var(--accent); font-weight: 600; }
+.layer-editor-desc  { color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.layer-editor-footer {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* borehole strip is now clickable */
+.bh-layers-strip { cursor: pointer; transition: box-shadow .15s; }
+.bh-layers-strip:hover { box-shadow: 0 0 0 2px var(--accent); }
+
   position: fixed;
   background: rgba(26,28,30,.95);
   border: 1px solid var(--border);
@@ -644,6 +798,10 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
         <label for="showLabels">Layer classification labels</label>
       </div>
       <div class="checkbox-row">
+        <input type="checkbox" id="showTexture" checked>
+        <label for="showTexture">Lithology &amp; find textures</label>
+      </div>
+      <div class="checkbox-row">
         <input type="checkbox" id="showDepthAxis" checked>
         <label for="showDepthAxis">Depth axis &amp; scale bar</label>
       </div>
@@ -666,6 +824,12 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
       <div style="display:flex;gap:6px;margin-bottom:8px;">
         <button class="btn-export" id="btnCorrConfirm" style="display:none;flex:1;" onclick="confirmConnection()">✓ Connect</button>
         <button class="btn-export" id="btnCorrCancel"  style="display:none;flex:1;" onclick="cancelSelection()">✕ Cancel</button>
+      </div>
+      <div class="corr-color-row" id="corrColorRow" style="display:none;">
+        <label>Band colour</label>
+        <div class="corr-color-preview" id="corrColorPreview" style="background:#888888;">
+          <input type="color" id="corrColorPicker" value="#888888">
+        </div>
       </div>
       <div class="corr-connections" id="corrConnections"></div>
       <button class="btn-export" id="btnCorrClearAll" style="margin-top:6px;width:100%;display:none;" onclick="clearAllConnections()">Clear All Connections</button>
@@ -705,6 +869,20 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
     </div>
   </div>
 
+</div>
+
+<!-- Layer colour editor modal -->
+<div class="layer-editor-backdrop" id="layerEditorBackdrop" style="display:none;">
+  <div class="layer-editor-modal">
+    <div class="layer-editor-header">
+      <span class="layer-editor-title" id="layerEditorTitle">Edit Layer Colours</span>
+      <button class="layer-editor-close" onclick="closeLayerEditor()">✕</button>
+    </div>
+    <div class="layer-editor-list" id="layerEditorList"></div>
+    <div class="layer-editor-footer">
+      <button class="btn-export primary" style="flex:1;" onclick="closeLayerEditor()">Done</button>
+    </div>
+  </div>
 </div>
 
 <div id="tooltip"></div>
@@ -771,6 +949,874 @@ function darken(hex, amt=30) {
   return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+// ===================== PORTED SOIL ENGINE (from CoreLogger v0_1_9) =====================
+// Build the displayed KA5 code for a layer, appending the gradational base
+// soil as "X → Y" when the layer has a gradational shift (matches CoreLogger).
+function displayCode(l) {
+  let code = (l.officialDesc && l.officialDesc !== '-') ? l.officialDesc : '';
+  if (typeof gradeBaseCode === 'function') {
+    const base = gradeBaseCode(l);
+    if (base) code = code ? `${code} → ${base}` : `→ ${base}`;
+  }
+  return code;
+}
+
+const DE_TO_EN_RAW = {
+    // ── Main types (longest compounds first) ──
+    "hochmoortorf":         "raised bog peat",
+    "übergangstorf":        "transition peat",
+    "ubergangstorf":        "transition peat",
+    "niedermoortorf":       "fen peat",
+    "amorpher torf":        "amorphous peat",
+    "wattenmeer sand":      "tidal flat sand",
+    "wattsand":             "tidal flat sand",
+    "wattschluff":          "tidal flat silt",
+    "wattton":              "tidal flat clay",
+    "wattmud":              "tidal flat mud",
+    "strandwall sand":      "beach ridge sand",
+    "strandsand":           "beach sand",
+    "beckensand":           "basin sand",
+    "beckenschluff":        "basin silt",
+    "beckenton":            "basin clay",
+    "banderton":            "varved clay",
+    "bänderton":            "varved clay",
+    "bandermergel":         "varved marl",
+    "bändermergel":         "varved marl",
+    "seekreide":            "lake chalk",
+    "seemergel":            "lake marl",
+    "seesand":              "lake sand",
+    "seeschluff":           "lake silt",
+    "seeton":               "lake clay",
+    "seelehm":              "lake loam",
+    "kernverlust":          "core loss",
+    "feiner ton":           "fine clay",
+    "mittelton":            "medium clay",
+    "grobton":              "coarse clay",
+    "feinschluff":          "fine silt",
+    "mittelschluff":        "medium silt",
+    "grobschluff":          "coarse silt",
+    "feinsand":             "fine sand",
+    "mittelsand":           "medium sand",
+    "grobsand":             "coarse sand",
+    "feinkies":             "fine gravel",
+    "mittelkies":           "medium gravel",
+    "grobkies":             "coarse gravel",
+    "schluff":              "silt",
+    "torf":                 "peat",
+    "lehm":                 "loam",
+    "sand":                 "sand",
+    "kies":                 "gravel",
+    "ton":                  "clay",
+    "mistschicht":          "manure layer",
+    "anthropogene organikschicht":  "anthropogenic organic layer",
+    "organische Schicht":   "organic layer",
+
+    
+    // ── Modifiers ──
+    "sehr schwach zersetzt":     "very weakly decomposed",
+    "schwach zersetzt":          "weakly decomposed",
+    "mittel zersetzt":           "moderately decomposed",
+    "stark zersetzt":            "strongly decomposed",
+    "sehr stark zersetzt":       "very strongly decomposed",
+    "anthropogen organisch":     "anthropogenic organic",
+    "schwach tonig":             "slightly clayey",
+    "mittel tonig":              "moderately clayey",
+    "stark tonig":               "strongly clayey",
+    "schwach schluffig":         "slightly silty",
+    "mittel schluffig":          "moderately silty",
+    "stark schluffig":           "strongly silty",
+    "schwach sandig":            "slightly sandy",
+    "mittel sandig":             "moderately sandy",
+    "stark sandig":              "strongly sandy",
+    "feinsandig":                "fine sandy",
+    "feinsandiger":              "fine sandy",
+    "mittelsandig":              "medium sandy",
+    "mittelsandiger":            "medium sandy",
+    "grobsandig":                "coarse sandy",
+    "grobsandiger":              "coarse sandy",
+    "anthropogen":               "anthropogenic",
+    "tonig":                     "clayey",
+    "toniger":                   "clayey",  
+    "schluffig":                 "silty",
+    "schluffiger":               "silty",   
+    "sandig":                    "sandy",
+    "sandiger":                  "sandy",
+    "kiesig":                    "gravelly",
+    "kiesiger":                  "gravelly",
+    "kalkhaltig":                "calcareous",
+    "kalkhaltiger":              "calcareous",
+    "kalkiger":                  "calcareous",
+    "kalkig":                    "calcareous",
+    "humos":                     "humic",
+    "humoser":                   "humic",  
+    "humusreich":                "humic",
+    "humusreicher":              "humic",
+    "humushaltig":               "humic",
+    "durchwurzelt":              "rooted",
+    "verwurzelt":                "rooted",
+    "holzkohle":                 "charcoal",
+    "eisenoxid":                 "iron oxide",
+    "muschelschalen":            "mussel shells",
+    "muschelschale":             "mussel shell",
+    "schneckenschalen":          "gastropod shells",
+    "schneckenschale":           "gastropod shell",
+    "molluskenschalen":          "mollusc shells",
+    "molluskenschale":           "mollusc shell",
+    "austernschalen":            "oyster shells",
+    "austernschale":             "oyster shell",
+    "schalentiere":              "shellfish",
+    "muscheln":                  "mussels",
+    "muschel":                   "mussel",
+    "austern":                   "oysters",
+    "auster":                    "oyster",
+    "schnecken":                 "gastropods",
+    "schnecke":                  "gastropod",
+    "schalen":                   "shells",
+    "schale":                    "shell",
+    "intakte schalen":           "intact shells",
+    "intakte muscheln":          "intact mussels",
+    "ganze schalen":             "complete shells",
+    "ferruginoes":               "ferruginous",
+    "ferruginös":                "ferruginous",
+    "geschichtet":               "layered",
+    "laminiert":                 "laminated",
+    "gebändert":                 "banded",
+    "gebandert":                 "banded",
+    "gefleckt":                  "mottled",
+    "marmoriert":                "marbled",
+    "gesprenkelt":               "spotted",
+    "fleckig":                   "patchy",
+    "gestört":                   "disturbed",
+    "gestort":                   "disturbed",
+    "bioturbiert":               "bioturbated",
+    "organisch":                 "organic",
+    "fein":                      "fine",
+    "mittel":                    "medium",
+    "grob":                      "coarse"
+};
+
+// Pre-sort by length descending so compound phrases are matched first
+const DE_TO_EN_SORTED = Object.entries(DE_TO_EN_RAW)
+    .sort((a, b) => b[0].length - a[0].length);
+
+function normalizeUmlauts(str) {
+    return str
+        .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue')
+        .replace(/Ä/g,'ae').replace(/Ö/g,'oe').replace(/Ü/g,'ue')
+        .replace(/ß/g,'ss');
+}
+
+function translateGermanToEnglish(desc) {
+    let out = desc.toLowerCase();
+    for (const [de, en] of DE_TO_EN_SORTED) {
+        // Use word-boundary-aware replace — German words don't always have \b
+        const escaped = de.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        out = out.replace(new RegExp('(?<![a-z])' + escaped + '(?![a-z])', 'gi'), en);
+    }
+    // Also try with normalised umlauts
+    const normalized = normalizeUmlauts(desc.toLowerCase());
+    for (const [de, en] of DE_TO_EN_SORTED) {
+        const normDe  = normalizeUmlauts(de);
+        const escaped = normDe.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        out = out.replace(new RegExp('(?<![a-z])' + escaped + '(?![a-z])', 'gi'), en);
+    }
+    return out;
+}
+
+function detectLanguage(desc) {
+    const d = desc.toLowerCase();
+    const deKeys = Object.keys(DE_TO_EN_RAW);
+    return deKeys.some(k => d.includes(k) || normalizeUmlauts(d).includes(normalizeUmlauts(k))) ? 'de' : 'en';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOIL DATA (inlined from soilData.json)
+
+const SOIL_DATA = 
+{
+    "colors": [
+    { "name": "White",                          "hex": "#d6d1c9", "munsell": "10YR 8/1"  },
+    { "name": "Pale Yellow",                    "hex": "#F1E4B8", "munsell": "2.5Y 8/4"  },
+    { "name": "Pale Yellow",                    "hex": "#FCD683", "munsell": "2.5Y 8/8"  },
+    { "name": "Brownish Yellow",                "hex": "#C1A365", "munsell": "10YR 6/6"  },
+
+    { "name": "Light Yellowish Brown",          "hex": "#CCBC9A", "munsell": "10YR 7/3"  },
+    { "name": "Light Yellowish Brown",          "hex": "#D3C79F", "munsell": "10YR 7/4"  },
+    { "name": "Light Yellowish Brown",          "hex": "#c9bda5", "munsell": "10YR 7/3"  },
+    { "name": "Light Yellowish Brown",          "hex": "#a79273", "munsell": "10YR 6/4"  },
+    { "name": "Light Olive Brown",              "hex": "#8d7f57", "munsell": "2.5Y 5/4"  },
+    { "name": "Light Olive Brown",              "hex": "#958A6C", "munsell": "2.5Y 6/4"  },
+    { "name": "Light Reddish Brown",            "hex": "#BAA391", "munsell": "5YR 6/4"   },
+    { "name": "Light Brown",                    "hex": "#a18d75", "munsell": "7.5YR 6/4" },
+    { "name": "Yellowish Brown",                "hex": "#877353", "munsell": "10YR 5/4"  },
+    { "name": "Yellowish Brown",                "hex": "#958261", "munsell": "10YR 5/6"  },
+    { "name": "Grayish Yellowish Brown",        "hex": "#857f76", "munsell": "10YR 5/2"  },
+    { "name": "Brown",                          "hex": "#857766", "munsell": "7.5YR 5/4" },
+    { "name": "Moderate Brown",                 "hex": "#705c42", "munsell": "7.5YR 4/4" },
+    { "name": "Strong Brown",                   "hex": "#7a593e", "munsell": "7.5YR 5/6" },
+    { "name": "Moderate Reddish Brown",         "hex": "#A0887C", "munsell": "5YR 5/4"   },
+    { "name": "Moderate Reddish Brown",         "hex": "#7e5241", "munsell": "5YR 4/4"   },
+    { "name": "Dark Reddish Brown",             "hex": "#6e460b", "munsell": "5YR 3/4"   },
+    { "name": "Dark Yellowish Brown",           "hex": "#69563c", "munsell": "10YR 4/4"  },
+    { "name": "Dark Yellowish Brown",           "hex": "#68583F", "munsell": "10YR 4/6"  },
+    { "name": "Dark Brown",                     "hex": "#675949", "munsell": "7.5YR 4/2" },
+    { "name": "Dark Brown",                     "hex": "#4e4131", "munsell": "7.5YR 3/2" },
+    { "name": "Dark Brown",                     "hex": "#4d3f33", "munsell": "7.5YR 3/3" },
+    { "name": "Dark Brown",                     "hex": "#3b3022", "munsell": "7.5YR 2/2" },
+    { "name": "Dark Grayish Yellowish Brown",   "hex": "#736757", "munsell": "10YR 4/2"  },
+    { "name": "Dark Grayish Yellowish Brown",   "hex": "#645b50", "munsell": "10YR 4/1"  },
+    { "name": "Dark Reddish Brown",             "hex": "#503932", "munsell": "5YR 3/3"   },
+    { "name": "Dark Grayish Brown",             "hex": "#59554f", "munsell": "2.5Y 3/2"  },
+    { "name": "Brownish Black",                 "hex": "#24201b", "munsell": "7.5YR 2/1" },
+    { "name": "Very Dark Brown",                "hex": "#4A4339", "munsell": "10YR 3/2"  },
+    { "name": "Very Dark Brown",                "hex": "#2c2621", "munsell": "10YR 2/1"  },
+    { "name": "Very Dark Grayish Brown",        "hex": "#5E5649", "munsell": "10YR 3/1"  },
+    { "name": "Very Dark Grayish Brown",        "hex": "#4b443b", "munsell": "2.5Y 3/1"  },
+
+    { "name": "Light Brownish Gray",            "hex": "#bcb6ad", "munsell": "10YR 7/1"  },
+    { "name": "Light Brownish Gray",            "hex": "#C9BDA5", "munsell": "2.5Y 7/2"  },
+    { "name": "Light Brownish Gray",            "hex": "#AFA48E", "munsell": "10YR 6/2"  },
+    { "name": "Light Greenish Gray",            "hex": "#BFC1B3", "munsell": "5Y 7/1"    },
+    { "name": "Light Olive Gray",               "hex": "#AEAC93", "munsell": "5Y 6/2"    },
+    { "name": "Light Gray",                     "hex": "#C7C6BF", "munsell": "2.5Y 7/1"  },
+    { "name": "Medium Gray",                    "hex": "#828282", "munsell": "N 5/"       },
+    { "name": "Greenish Gray",                  "hex": "#A6A89B", "munsell": "5Y 6/1"    },
+    { "name": "Dark Greenish Gray",             "hex": "#7a8279", "munsell": "5GY 5/1"   },
+    { "name": "Light Bluish Green",             "hex": "#99C1C2", "munsell": "5BG 7/2"   },
+    { "name": "Moderate Greenish Blue",         "hex": "#778385", "munsell": "5B 5/2"    },
+    { "name": "Olive Gray",                     "hex": "#8b8773", "munsell": "5Y 5/2"    },
+    { "name": "Olive Gray",                     "hex": "#716E5B", "munsell": "5Y 4/2"    },
+    { "name": "Dark Brownish Gray",             "hex": "#706C63", "munsell": "10YR 4/1"  },
+    { "name": "Dark Gray",                      "hex": "#616363", "munsell": "N 4/"       },
+    { "name": "Dark Gray",                      "hex": "#48494B", "munsell": "N 3/"       },
+    { "name": "Dark Olive Gray",                "hex": "#605D4E", "munsell": "5Y 4/1"    },
+    { "name": "Dark Greenish Gray",             "hex": "#6E7168", "munsell": "5GY 4/1"   },
+    { "name": "Very Dark Grayish Brown",        "hex": "#59554C", "munsell": "2.5Y 3/1"  },
+    { "name": "Black",                          "hex": "#433f3c", "munsell": "N 2/"       },
+
+    { "name": "Light Grayish Olive",            "hex": "#ABAC8D", "munsell": "5Y 6/3"    },
+    { "name": "Grayish Olive",                  "hex": "#8D8F79", "munsell": "5Y 5/3"    },
+    { "name": "Light Olive",                    "hex": "#8F8B66", "munsell": "5Y 5/4"    },
+    { "name": "Grayish Olive Green",            "hex": "#8B947F", "munsell": "5GY 5/2"   },
+
+    { "name": "Moderate Reddish Orange",        "hex": "#a15b35", "munsell": "5YR 4/6"   },
+    { "name": "Deep Reddish Brown",             "hex": "#662a22", "munsell": "2.5YR 3/6" },
+
+    { "name": "Greenish Black",                 "hex": "#484A3F", "munsell": "5GY 2/1"   },
+    { "name": "Black",                          "hex": "#211f1e", "munsell": "N 2/"       },
+    { "name": "Brownish Black",                 "hex": "#231f20", "munsell": "7.5YR 2/1" },
+
+    { "name": "No Colour",                      "hex": "#ffffff", "munsell": ""           },
+
+   { "name": "Pale Yellow / Cream",         "hex": "#F5F3C4", "munsell": "" },
+  { "name": "Light Yellowish Orange",      "hex": "#FCD8A7", "munsell": "" },
+  { "name": "Medium Muted Yellow",         "hex": "#D4A357", "munsell": "" },
+  { "name": "Light Reddish Orange",        "hex": "#E69555", "munsell": "" },
+  { "name": "Medium Reddish Brown",        "hex": "#C86A4B", "munsell": "" },
+  { "name": "Dark Reddish Brown",          "hex": "#8E3E2B", "munsell": "" },
+  { "name": "Light Pale Green",            "hex": "#82CFB3", "munsell": "" },
+  { "name": "Medium Olive Green",          "hex": "#6B7A4F", "munsell": "" },
+  { "name": "Dark Forest Green",           "hex": "#4A6B56", "munsell": "" },
+  { "name": "Light Pale Blue",             "hex": "#9BE3F2", "munsell": "" },
+  { "name": "Medium Muted Blue",           "hex": "#5A7D9A", "munsell": "" },
+  { "name": "Light Grey",                  "hex": "#C2C2C2", "munsell": "" },
+  { "name": "Light Greyish Brown",         "hex": "#967E6E", "munsell": "" },
+  { "name": "Medium Muted Brown",          "hex": "#7D6656", "munsell": "" },
+  { "name": "Dark Brown",                  "hex": "#5C4A3C", "munsell": "" },
+  { "name": "Very Dark Brown",             "hex": "#3D2F24", "munsell": "" },
+  { "name": "Dark Grey",                   "hex": "#555A60", "munsell": "" },
+  { "name": "Very Dark Grey / Near Black", "hex": "#2B2D2F", "munsell": "" }
+
+],
+     
+    "soilMains": {
+        "clay": "T",
+        "fine clay": "fT",
+        "medium clay": "mT",
+        "coarse clay": "gT",
+        "silt": "U",
+        "fine silt": "fU",
+        "medium silt": "mU",
+        "coarse silt": "gU",
+        "loam": "L",
+        "sand": "S",
+        "fine sand": "fS",
+        "medium sand": "mS",
+        "coarse sand": "gS",
+        "gravel": "G",
+        "fine gravel": "fG",
+        "medium gravel": "mG",
+        "coarse gravel": "gG",
+        "peat": "H",
+        "raised bog peat": "Hh",
+        "transition peat": "Hu",
+        "fen peat": "Hn",
+        "amorphous peat": "Ha",
+        "tidal flat sand": "Swa",
+        "tidal flat silt": "Uwa",
+        "tidal flat clay": "Twa",
+        "tidal flat mud": "TUwa",
+        "beach ridge sand": "Sstw",
+        "beach sand": "Sst",
+        "lake sand": "Fss",
+        "lake silt": "Fsu",
+        "lake clay": "Fst",
+        "lake loam": "Fsl",
+        "lake marl": "Fsm",
+        "lake chalk": "Fkk",
+        "basin sand": "Sb",
+        "basin silt": "Ub",
+        "basin clay": "Tb",
+        "varved clay": "Tbd",
+        "varved marl": "Mbd",
+        "sand gyttja": "Fms",
+        "core loss": "NA",
+        "manure layer": "hY",
+        "anthropogenic organic layer": "hY",
+        "organic layer": "H"
+    },
+    "soilModifiers": {
+        "clayey": "t",  
+        "slightly clayey": "t2",
+        "moderately clayey": "t3",
+        "strongly clayey": "t4",
+        "silty": "u",
+        "slightly silty": "u2",
+        "moderately silty": "u3",
+        "strongly silty": "u4",
+        "sandy": "s",
+        "slightly sandy": "s2",
+        "moderately sandy": "s3",
+        "strongly sandy": "s4",
+        "fine sandy": "fs",
+        "medium sandy": "ms",
+        "coarse sandy": "gs",
+        "loamy": "l",
+        "slightly loamy": "l2",
+        "moderately loamy": "l3",
+        "strongly loamy": "l4",
+        "gravelly": "g",
+        "humic": "h",
+        "calcareous": "ca",
+        "anthropogenic organic": "yh",
+        "anthropogenic": "y",
+        "very weakly decomposed": "z1",
+        "weakly decomposed": "z2",
+        "moderately decomposed": "z3",
+        "strongly decomposed": "z4",
+        "very strongly decomposed": "z5",
+        "layered": "lam",
+        "laminated": "lam",
+        "banded": "lam",
+        "mottled": "mot",
+        "marbled": "mot",
+        "spotted": "sp",
+        "speckled": "sp",
+        "patchy": "sp",
+        "disturbed": "dist",
+        "bioturbated": "biot",
+        "shell fragments": "sh",
+        "shell fragment": "sh",
+        "shells": "sh",
+        "shell": "sh",
+        "mussels": "sh",
+        "mussel": "sh",
+        "mussel shells": "sh",
+        "mollusc shells": "sh",
+        "gastropod shells": "sh",
+        "oyster shells": "sh",
+        "intact shells": "sh!",
+        "intact mussels": "sh!",
+        "complete shells": "sh!"
+
+    }
+};
+
+let SOIL_MAINS = SOIL_DATA.soilMains;
+
+let SOIL_MODIFIERS = SOIL_DATA.soilModifiers;
+
+const PETRO_PRIMARY = [
+    // code, English word, German
+    { code: 'S',  en: 'sand',          de: 'Sand' },
+    { code: 'U',  en: 'silt',          de: 'Schluff' },
+    { code: 'T',  en: 'clay',          de: 'Ton' },
+    { code: 'L',  en: 'loam',          de: 'Lehm' },
+    { code: 'G',  en: 'gravel',        de: 'Kies' },
+    { code: 'X',  en: 'stones',        de: 'Steine' },
+    { code: 'H',  en: 'peat',          de: 'Torf' },
+    { code: 'Mu', en: 'mud',           de: 'Mudde' },
+    { code: 'Hn', en: 'fen peat',      de: 'Niedermoortorf' },
+    { code: 'Hh', en: 'bog peat',      de: 'Hochmoortorf' },
+    { code: 'Fs', en: 'fine sand',     de: 'Feinsand' },
+    { code: 'Ms', en: 'medium sand',   de: 'Mittelsand' },
+    { code: 'Gs', en: 'coarse sand',   de: 'Grobsand' },
+    { code: 'Fk', en: 'fine gravel',   de: 'Feinkies' },
+    { code: 'Mk', en: 'medium gravel', de: 'Mittelkies' },
+    { code: 'Gk', en: 'coarse gravel', de: 'Grobkies' },
+    { code: 'O',  en: 'organic matter',de: 'Organik' }
+];
+const PETRO_SECONDARY = [
+    // code (lowercase), English adjective, German
+    { code: 's',  en: 'sandy',       de: 'sandig' },
+    { code: 'u',  en: 'silty',       de: 'schluffig' },
+    { code: 't',  en: 'clayey',      de: 'tonig' },
+    { code: 'l',  en: 'loamy',       de: 'lehmig' },
+    { code: 'g',  en: 'gravelly',    de: 'kiesig' },
+    { code: 'h',  en: 'humic',       de: 'humos' },
+    { code: 'fs', en: 'fine-sandy',  de: 'feinsandig' },
+    { code: 'ms', en: 'medium-sandy',de: 'mittelsandig' },
+    { code: 'gs', en: 'coarse-sandy',de: 'grobsandig' },
+    { code: 'k',  en: 'calcareous',  de: 'kalkig' },
+    { code: 'fe', en: 'ferruginous', de: 'eisenhaltig' },
+    { code: 'o',  en: 'organic',     de: 'organisch' }
+];
+
+function petroLookupPrimary(code)   { return PETRO_PRIMARY.find(p => p.code === code) || null; }
+function petroLookupSecondary(code) { return PETRO_SECONDARY.find(p => p.code === code) || null; }
+
+function translateSoil(desc) {
+    // Run German→English first, then classify
+    let normalized = translateGermanToEnglish(desc);
+    // The gradual-shift feature appends " → <base soil>" to the description.
+    // That suffix describes the BASE of the layer and is classified separately
+    // (see gradeBaseCode); the layer's own code must come from the TOP soil
+    // only, so drop everything from the arrow onward before classifying.
+    const arrowIdx = normalized.indexOf('→');
+    if (arrowIdx !== -1) normalized = normalized.slice(0, arrowIdx);
+    // Normalise hyphenated compound modifiers ("fine-sandy" → "fine sandy")
+    // so they match the dictionary keys, which use spaces.
+    normalized = normalized.replace(/-/g, ' ');
+    const d = normalized.toLowerCase();
+
+    // ── Pass 1: extract MODIFIER phrases first ──────────────────────────
+    // KA5 order is "<adjectives> <noun>": the trailing noun is the main soil,
+    // the adjectives before it are modifiers. Compound modifier phrases like
+    // "fine sandy" contain a main-type substring ("fine sand"), so if we
+    // matched mains first we'd wrongly pick fine sand. Instead we strip the
+    // longest modifier phrases out of the text first (longest-first so
+    // "fine sandy" wins over "sandy"), then classify the main from the rest.
+    let residue = ' ' + d.replace(/[(),]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    const modifiers = [];
+    const modKeys = Object.keys(SOIL_MODIFIERS).sort((a, b) => b.length - a.length);
+    for (const key of modKeys) {
+        const re = new RegExp('(?<![a-z])' + key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '(?![a-z])', 'g');
+        if (re.test(residue)) {
+            modifiers.push(SOIL_MODIFIERS[key]);
+            residue = residue.replace(re, ' ');   // remove so its words can't re-trigger
+        }
+    }
+
+    // ── Pass 2: find the MAIN soil type in what's left ──────────────────
+    // Word-boundary match, prefer the LONGEST key, break ties by latest pos.
+    let main = '-', mainMatchLen = -1, mainPos = -1;
+    for (const [key, val] of Object.entries(SOIL_MAINS)) {
+        const re = new RegExp('(?<![a-z])' + key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '(?![a-z])', 'g');
+        let m, lastIdx = -1;
+        while ((m = re.exec(residue)) !== null) lastIdx = m.index;
+        if (lastIdx === -1) continue;
+        if (key.length > mainMatchLen || (key.length === mainMatchLen && lastIdx > mainPos)) {
+            mainMatchLen = key.length;
+            mainPos      = lastIdx;
+            main         = val;
+        }
+    }
+
+    const uniqueMods = [...new Set(modifiers)].sort();
+    if (main === '-') return '-';
+    return uniqueMods.length ? `${main}(${uniqueMods.join(',')})` : main;
+}
+
+function classifyGradeCodes(phrase) {
+    const code = translateSoil(phrase);            // e.g. "T(g)" or "U(l,h)" or "-"
+    if (!code || code === '-') return { gradeTo: null, gradeSecondaries: [] };
+    const m = code.match(/^([A-Za-z]+)(?:\(([^)]*)\))?$/);
+    if (!m) return { gradeTo: null, gradeSecondaries: [] };
+    const primary = m[1];
+    // gradeTo must be a known petrography primary (S, U, T, L, G, …)
+    const gradeTo = (typeof petroLookupPrimary === 'function' && petroLookupPrimary(primary)) ? primary : null;
+    if (!gradeTo) return { gradeTo: null, gradeSecondaries: [] };
+    const secs = (m[2] ? m[2].split(',').map(s => s.trim()).filter(Boolean) : [])
+        .filter(c => typeof petroLookupSecondary === 'function' && petroLookupSecondary(c));
+    return { gradeTo, gradeSecondaries: secs };
+}
+
+const PRIMARY_REDUNDANT_MODS = {
+    S: ['s', 'fs', 'ms', 'gs'],   // sand ↔ sandy / fine-/medium-/coarse-sandy
+    U: ['u'],                     // silt ↔ silty
+    T: ['t'],                     // clay ↔ clayey
+    L: ['l'],                     // loam ↔ loamy
+    G: ['g'],                     // gravel ↔ gravelly
+    // fine/medium/coarse sands also count as "sand" for the sandy modifiers
+    Fs: ['s', 'fs', 'ms', 'gs'],
+    Ms: ['s', 'fs', 'ms', 'gs'],
+    Gs: ['s', 'fs', 'ms', 'gs'],
+    Fk: ['g'], Mk: ['g'], Gk: ['g']
+};
+function nonRedundantMods(primaryCode, secondaryCodes) {
+    const banned = PRIMARY_REDUNDANT_MODS[primaryCode] || [];
+    return (secondaryCodes || []).filter(c => c && !banned.includes(c));
+}
+
+function gradeBaseCode(l) {
+    if (!l.gradeTo) return null;
+    const secs = nonRedundantMods(l.gradeTo,
+        Array.isArray(l.gradeSecondaries) ? l.gradeSecondaries.filter(Boolean) : []).slice().sort();
+    if (secs.length) return `${l.gradeTo}(${secs.join(',')})`;
+    if (Array.isArray(l.gradeSecondaries) && l.gradeSecondaries.length) return l.gradeTo;
+    const top = l.officialDesc || (typeof translateSoil === 'function' ? translateSoil(l.originalDesc || '') : '-');
+    const mods = (top && top.indexOf('(') !== -1) ? top.slice(top.indexOf('(')) : '';   // "(h)" or ""
+    return l.gradeTo + mods;
+}
+
+// ----- render helpers -----
+
+const CORE_W_REF = 110;
+
+const SOIL_WIDTH_FRAC = {
+    // fines → narrow
+    'T':  0.42,   // clay
+    'U':  0.55,   // silt
+    'L':  0.62,   // loam
+    'Mu': 0.50,   // mud
+    // organics (kept mid-narrow, distinct from minerals)
+    'H':  0.58,   // peat
+    'Hn': 0.58,   // fen peat
+    'Hh': 0.58,   // bog peat
+    'O':  0.55,   // organic matter
+    // sands → medium, by sub-grade
+    'S':  0.74,   // sand (unspecified)
+    'Fs': 0.66,   // fine sand
+    'Ms': 0.78,   // medium sand
+    'Gs': 0.88,   // coarse sand
+    // gravels → wide, by sub-grade
+    'G':  0.92,   // gravel (unspecified)
+    'Fk': 0.86,   // fine gravel
+    'Mk': 0.94,   // medium gravel
+    'Gk': 1.00,   // coarse gravel
+    // stones → widest
+    'X':  1.00    // stones
+};
+
+function layerMainCode(layer) {
+    const official = translateSoil(layer.originalDesc || '');   // e.g. "Fs(u,h)" or "-"
+    if (official && official !== '-') {
+        const m = official.match(/^[A-Za-z]+/);   // "Fs(u)" → "Fs"
+        if (m) return m[0];
+    }
+    return null;
+}
+
+function widthFracForCode(code) {
+    let frac = (code && SOIL_WIDTH_FRAC[code] != null) ? SOIL_WIDTH_FRAC[code] : null;
+    if (frac == null) frac = 0.74;   // sensible default (sand-like) when unknown
+    return frac;
+}
+
+function grainFamily(code) {
+    if (!code) return null;
+    if (code === 'X') return 'gravel';
+    if (/^G/.test(code) || code === 'Fk' || code === 'Mk' || code === 'Gk') return 'gravel';
+    if (/^F?s$/i.test(code) || code === 'S' || code === 'Fs' || code === 'Ms' || code === 'Gs') return 'sand';
+    if (code === 'U') return 'silt';
+    if (code === 'T') return 'clay';
+    if (code === 'L') return 'loam';      // loam = mixed → light stipple
+    if (code === 'Mu') return 'mud';
+    if (/^H/.test(code) || code === 'O') return 'organic';
+    return null;
+}
+
+function drawGrainTexture(ctx, code, x, y, w, h, alpha) {
+    const fam = grainFamily(code);
+    if (!fam || w <= 0 || h <= 0) return;
+    const a = alpha == null ? 1 : Math.max(0, Math.min(1, alpha));
+    if (a <= 0.02) return;
+
+    let seed = Math.floor(x*13 + y*7 + w*5 + h*3 + fam.length*17);
+    const rand = () => { seed = (seed*16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    if (fam === 'sand' || fam === 'loam') {
+        const base = fam === 'sand' ? 90 : 55;
+        const n = Math.max(6, Math.floor((w*h) / base));
+        ctx.fillStyle = `rgba(60,45,25,${0.32 * a})`;
+        for (let i = 0; i < n; i++) {
+            const dx = x + rand()*w, dy = y + rand()*h, r = 0.6 + rand()*1.0;
+            ctx.beginPath(); ctx.arc(dx, dy, r, 0, Math.PI*2); ctx.fill();
+        }
+    } else if (fam === 'silt') {
+        const n = Math.max(10, Math.floor((w*h) / 32));
+        ctx.fillStyle = `rgba(70,60,40,${0.20 * a})`;
+        for (let i = 0; i < n; i++) {
+            const dx = x + rand()*w, dy = y + rand()*h;
+            ctx.beginPath(); ctx.arc(dx, dy, 0.4 + rand()*0.5, 0, Math.PI*2); ctx.fill();
+        }
+    } else if (fam === 'clay') {
+        // horizontal dashes in offset rows — the standard clay ornament
+        ctx.strokeStyle = `rgba(40,40,55,${0.30 * a})`;
+        ctx.lineWidth = 1;
+        const rowH = 7;
+        let row = 0;
+        for (let cy = y + 4; cy < y + h; cy += rowH, row++) {
+            const dashLen = 9, gap = 9;
+            const offset = (row % 2) * (dashLen + gap) * 0.5;
+            for (let cx = x - offset; cx < x + w; cx += dashLen + gap) {
+                const x0 = Math.max(x, cx), x1 = Math.min(x + w, cx + dashLen);
+                if (x1 > x0) { ctx.beginPath(); ctx.moveTo(x0, cy); ctx.lineTo(x1, cy); ctx.stroke(); }
+            }
+        }
+    } else if (fam === 'gravel') {
+        const n = Math.max(3, Math.floor((w*h) / 240));
+        for (let i = 0; i < n; i++) {
+            const dx = x + 3 + rand()*(w-6), dy = y + 3 + rand()*(h-6);
+            const rx = 2.2 + rand()*3.2, ry = rx * (0.65 + rand()*0.3), rot = rand()*Math.PI;
+            ctx.save(); ctx.translate(dx, dy); ctx.rotate(rot);
+            ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2);
+            ctx.strokeStyle = `rgba(55,50,45,${0.45 * a})`; ctx.lineWidth = 0.9; ctx.stroke();
+            ctx.fillStyle = `rgba(120,110,95,${0.10 * a})`; ctx.fill();
+            ctx.restore();
+        }
+    } else if (fam === 'mud' || fam === 'organic') {
+        const n = Math.max(8, Math.floor((w*h) / 60));
+        ctx.fillStyle = `rgba(30,25,15,${0.18 * a})`;
+        for (let i = 0; i < n; i++) {
+            const dx = x + rand()*w, dy = y + rand()*h;
+            const rx = 0.8 + rand()*1.6, ry = 0.4 + rand()*0.8, rot = rand()*Math.PI;
+            ctx.save(); ctx.translate(dx, dy); ctx.rotate(rot);
+            ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+        }
+    }
+    ctx.restore();
+}
+
+function drawTextureOverlay(ctx, desc, x, y, w, h) {
+    if (!desc) return;
+    // translate German so texture keywords are found in English too
+    const d = translateGermanToEnglish(desc).toLowerCase();
+    ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+
+    // Break down the text by list separators (commas, semicolons, periods)
+    const textSegments = d.split(/[,;\.]+/);
+
+    // Helper to extract modifiers by checking which segment contains the target texture
+    const getModifiers = (targetRegex) => {
+        let intensity = 1.0;
+        let density = 1.0;
+
+        // Find the specific segment that contains our texture keyword
+        const matchingSegment = textSegments.find(segment => targetRegex.test(segment)) || "";
+
+        if (matchingSegment) {
+            if (/strong|intense|stark|viele|abundant|many|lot|zahlreich|reich/.test(matchingSegment)) {
+                intensity = 1.8;
+                density = 2.0;
+            } else if (/little|few|wenig|vereinzelt|view|rare|selten/.test(matchingSegment)) {
+                intensity = 0.4;
+                density = 0.35;
+            }
+        }
+        return { intensity, density };
+    };
+
+    if (/marbled|mottled/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/marbled|mottled/);
+        let seed = x*7+y*13+w*3+h*5;
+        const rand = () => { seed=(seed*16807)%2147483647; return (seed-1)/2147483646; };
+        const bc = Math.max(4, Math.floor((h/18) * dm));
+        for (let i=0;i<bc;i++) {
+            const bx=x+rand()*w, by=y+rand()*h, rx=4+rand()*(w*.35), ry=3+rand()*(h*.12), ang=rand()*Math.PI;
+            ctx.save(); ctx.translate(bx,by); ctx.rotate(ang); ctx.beginPath(); ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
+            ctx.fillStyle=`rgba(255,255,255,${Math.min(1, (.10+rand()*.12) * im)})`; ctx.fill(); ctx.restore();
+            ctx.save(); ctx.translate(bx+rx*.4,by+ry*.4); ctx.rotate(ang+.5); ctx.beginPath(); ctx.ellipse(0,0,rx*.6,ry*.6,0,0,Math.PI*2);
+            ctx.fillStyle=`rgba(0,0,0,${Math.min(1, (.06+rand()*.08) * im)})`; ctx.fill(); ctx.restore();
+        }
+    }
+    if (/spotted|speckled|patchy/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/spotted|speckled|patchy/);
+        let seed=x*11+y*17+w*5+h*7;
+        const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const dc=Math.max(6, Math.floor(((w*h)/80) * dm));
+        for(let i=0;i<dc;i++){const dx=x+rand()*w,dy=y+rand()*h,r=1.5+rand()*3.5;ctx.beginPath();ctx.arc(dx,dy,r,0,Math.PI*2);ctx.fillStyle=rand()>.5?`rgba(255,255,255,${Math.min(1, (.18+rand()*.18) * im)})`:`rgba(0,0,0,${Math.min(1, (.12+rand()*.14) * im)})`;ctx.fill();}
+    }
+    if (/layered|banded|laminated/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/layered|banded|laminated/);
+        let seed=x*3+y*19+h*11; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const bs=(5+rand()*4) * (1 / dm);
+        let cy=y+bs*rand();
+        while(cy<y+h){const t=.8+rand()*1.4;ctx.fillStyle=rand()>.45?`rgba(0,0,0,${Math.min(1, (.05+rand()*.05) * im)})`:`rgba(255,255,255,${Math.min(1, (.05+rand()*.05) * im)})`;ctx.fillRect(x,cy,w,t);cy+=bs+rand()*3;}
+    }
+    if (/disturbed|bioturbated/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/disturbed|bioturbated/);
+        ctx.strokeStyle=`rgba(0,0,0,${Math.min(1, .13 * im)})`;ctx.lineWidth=1.0;
+        const step = Math.max(4, Math.floor(12 * (1 / dm)));
+        for(let lx=x-h;lx<x+w+h;lx+=step){ctx.beginPath();ctx.moveTo(lx,y);ctx.lineTo(lx+h,y+h);ctx.stroke();}
+        ctx.strokeStyle=`rgba(0,0,0,${Math.min(1, .07 * im)})`;
+        for(let lx=x+w+h;lx>x-h;lx-=step){ctx.beginPath();ctx.moveTo(lx,y);ctx.lineTo(lx-h,y+h);ctx.stroke();}
+    }
+    if (/calcareous/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/calcareous/);
+        let seed=x*23+y*7+h*13; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const dc=Math.max(8, Math.floor(((w*h)/55) * dm));
+        for(let i=0;i<dc;i++){const dx=x+rand()*w,dy=y+rand()*h;ctx.beginPath();ctx.arc(dx,dy,.9+rand()*1.2,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${Math.min(1, (.30+rand()*.25) * im)})`;ctx.fill();}
+    }
+    if (/charcoal|char coal|coal|holzkohle/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/charcoal|char coal|coal|holzkohle/);
+        let seed=x*41+y*29+h*17; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const fc=Math.max(4, Math.floor(((w*h)/180) * dm));
+        for(let i=0;i<fc;i++){const fx=x+rand()*w,fy=y+rand()*h,sides=3+Math.floor(rand()*3),rx=1.5+rand()*4,ry=.8+rand()*2.5,rot=rand()*Math.PI;ctx.save();ctx.translate(fx,fy);ctx.rotate(rot);ctx.beginPath();for(let s=0;s<sides;s++){const ang=(s/sides)*Math.PI*2;s===0?ctx.moveTo(Math.cos(ang)*rx,Math.sin(ang)*ry):ctx.lineTo(Math.cos(ang)*rx*(0.7+rand()*.6),Math.sin(ang)*ry*(0.7+rand()*.6));}ctx.closePath();ctx.fillStyle=`rgba(10,10,10,${Math.min(1, (.55+rand()*.30) * im)})`;ctx.fill();ctx.restore();}
+    }
+    if (/humic|humos/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/humic|humos/);
+        let seed=x*31+y*11+h*7; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const dc=Math.max(10, Math.floor(((w*h)/40) * dm));
+        for(let i=0;i<dc;i++){const dx=x+rand()*w,dy=y+rand()*h;ctx.beginPath();ctx.arc(dx,dy,.6+rand()*1,0,Math.PI*2);ctx.fillStyle=`rgba(0,0,0,${Math.min(1, (.18+rand()*.18) * im)})`;ctx.fill();}
+    }
+    if (/iron oxide|iron-oxide|ferruginous|eisenoxid/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/iron oxide|iron-oxide|ferruginous|eisenoxid/);
+        let seed=x*37+y*53+h*19; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const bc=Math.max(3, Math.floor(((w*h)/600) * dm));
+        for(let i=0;i<bc;i++){const bx=x+rand()*w,by=y+rand()*h,rx=3+rand()*(w*.28),ry=2+rand()*(h*.10),ang=rand()*Math.PI;ctx.save();ctx.translate(bx,by);ctx.rotate(ang);ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fillStyle=`rgba(180,80,10,${Math.min(1, (.02+rand()*.02) * im)})`;ctx.fill();ctx.restore();}
+        const sc=Math.max(6, Math.floor(((w*h)/90) * dm));  
+        for(let i=0;i<sc;i++){const sx=x+rand()*w,sy=y+rand()*h;ctx.beginPath();ctx.arc(sx,sy,.8+rand()*2.2,0,Math.PI*2);ctx.fillStyle=`rgba(160,55,5,${Math.min(1, (.10+rand()*.10) * im)})`;ctx.fill();}
+    }
+    if (/root|wurzel|durchwurzelt/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/root|wurzel|durchwurzelt/);
+        let seed=x*13+y*43+h*23; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const rc=Math.max(2, Math.floor((w/30) * dm));
+        for(let i=0;i<rc;i++){const sx=x+rand()*w;let cx1=sx,cy=y;ctx.beginPath();ctx.moveTo(cx1,cy);const segs=Math.max(2,Math.floor(h/12));for(let s=0;s<segs;s++){const sh=h/segs,nx=cx1+(rand()-.5)*w*.45,ny=cy+sh,c1x=cx1+(rand()-.5)*w*.3,c1y=cy+sh*.35,c2x=nx+(rand()-.5)*w*.3,c2y=ny-sh*.35;ctx.bezierCurveTo(c1x,c1y,c2x,c2y,nx,ny);cx1=nx;cy=ny;}const thick=.8+rand();ctx.strokeStyle=`rgba(100,60,20,${Math.min(1, (.20+rand()*.10) * im)})`;ctx.lineWidth=thick;ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash([]);ctx.stroke();}
+    }
+    // ── Shells / Mussels ──────────────────────────────────────────
+    const shellRegex = /shell|mussel|mollusc|gastropod|oyster|muschel|schale|schnecke|auster/;
+    if (shellRegex.test(d)) {
+        const intactRegex = /intact|complete|whole|ganz|intakt/;
+        const isIntact = intactRegex.test(d);
+
+        // Quantity from density modifiers
+        const { intensity: im, density: dm } = getModifiers(shellRegex);
+
+        let seed=x*59+y*37+h*13; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const sc = Math.max(3, Math.floor(((w*h)/320) * dm));
+
+        for (let i=0; i<sc; i++) {
+            const sx = x + rand()*w;
+            const sy = y + rand()*h;
+            const size = 3 + rand()*5;
+            const rot = rand()*Math.PI;
+
+            ctx.save();
+            ctx.translate(sx, sy);
+            ctx.rotate(rot);
+
+            if (isIntact && rand() > 0.4) {
+                // Draw a recognisable intact bivalve outline
+                const sw = size * 1.8, sh2 = size * 0.9;
+                // Left valve
+                ctx.beginPath();
+                ctx.ellipse(-sw*0.25, 0, sw*0.5, sh2, 0, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(200,180,130,${Math.min(1, 0.85*im)})`;
+                ctx.lineWidth = isIntact ? 1.3 : 0.8;
+                ctx.stroke();
+                // Right valve
+                ctx.beginPath();
+                ctx.ellipse( sw*0.25, 0, sw*0.5, sh2, 0, 0, Math.PI*2);
+                ctx.stroke();
+                // Hinge line
+                ctx.beginPath();
+                ctx.moveTo(-sw*0.15, -sh2*0.8);
+                ctx.lineTo( sw*0.15, -sh2*0.8);
+                ctx.lineWidth = 0.7;
+                ctx.stroke();
+
+                if (isIntact) {
+                    // Gold highlight ring to flag intact specimen
+                    ctx.beginPath();
+                    ctx.arc(0, 0, sw*0.65, 0, Math.PI*2);
+                    ctx.strokeStyle = `rgba(230,180,20,${Math.min(1, 0.7*im)})`;
+                    ctx.lineWidth = 1.4;
+                    ctx.setLineDash([2,2]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            } else {
+                // Irregular shell fragment
+                const pts = 5 + Math.floor(rand()*3);
+                ctx.beginPath();
+                for (let p=0;p<pts;p++) {
+                    const ang = (p/pts)*Math.PI*2;
+                    const r = size*(0.5+rand()*0.5);
+                    p===0 ? ctx.moveTo(Math.cos(ang)*r, Math.sin(ang)*r)
+                          : ctx.lineTo(Math.cos(ang)*r, Math.sin(ang)*r);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = `rgba(200,180,130,${Math.min(1, 0.60*im)})`;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+                // Faint rib lines inside fragment
+                ctx.beginPath();
+                ctx.moveTo(-size*0.4, 0); ctx.lineTo(size*0.4, 0);
+                ctx.strokeStyle = `rgba(180,155,105,${Math.min(1, 0.35*im)})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+    }
+    // ── Wood / plant macrofossils ─────────────────────────────────
+    if (/\bwood\b|twig|bark|\bseed\b|plant remains/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/wood|twig|bark|seed|plant/);
+        let seed=x*47+y*23+h*31; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const wc=Math.max(3, Math.floor(((w*h)/350) * dm));
+        for(let i=0;i<wc;i++){
+            const wx=x+rand()*w, wy=y+rand()*h, len=4+rand()*8, ang=rand()*Math.PI, thick=1.2+rand()*1.8;
+            ctx.save(); ctx.translate(wx,wy); ctx.rotate(ang);
+            ctx.strokeStyle=`rgba(107,66,38,${Math.min(1,0.75*im)})`; ctx.lineWidth=thick; ctx.lineCap='round';
+            ctx.beginPath(); ctx.moveTo(-len/2,0); ctx.lineTo(len/2,0); ctx.stroke();
+            // grain lines
+            ctx.strokeStyle=`rgba(80,48,26,${Math.min(1,0.4*im)})`; ctx.lineWidth=0.4;
+            ctx.beginPath(); ctx.moveTo(-len/2,-thick*0.2); ctx.lineTo(len/2,-thick*0.2); ctx.stroke();
+            ctx.restore();
+        }
+    }
+    // ── Ceramics / sherds ─────────────────────────────────────────
+    if (/ceramic|pottery|sherd|brick|tile|fired clay/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/ceramic|pottery|sherd|brick|tile|clay/);
+        let seed=x*53+y*19+h*29; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const cc=Math.max(2, Math.floor(((w*h)/420) * dm));
+        for(let i=0;i<cc;i++){
+            const cx2=x+rand()*w, cy2=y+rand()*h, sz=3+rand()*5, rot=rand()*Math.PI;
+            ctx.save(); ctx.translate(cx2,cy2); ctx.rotate(rot);
+            // angular sherd quad
+            ctx.beginPath();
+            ctx.moveTo(-sz, -sz*0.6); ctx.lineTo(sz*0.8, -sz*0.5);
+            ctx.lineTo(sz, sz*0.7); ctx.lineTo(-sz*0.7, sz*0.5); ctx.closePath();
+            ctx.fillStyle=`rgba(160,82,45,${Math.min(1,0.55*im)})`; ctx.fill();
+            ctx.strokeStyle=`rgba(110,50,25,${Math.min(1,0.7*im)})`; ctx.lineWidth=0.6; ctx.stroke();
+            ctx.restore();
+        }
+    }
+    // ── Stones / pebbles / clasts ─────────────────────────────────
+    if (/\bstone|pebble|cobble|gravel|flint|artefact/.test(d)) {
+        const { intensity: im, density: dm } = getModifiers(/stone|pebble|cobble|gravel|flint|artefact/);
+        let seed=x*61+y*17+h*37; const rand=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};
+        const sc2=Math.max(3, Math.floor(((w*h)/300) * dm));
+        for(let i=0;i<sc2;i++){
+            const sx=x+rand()*w, sy=y+rand()*h, rx=3+rand()*6, ry=rx*(0.6+rand()*0.3), rot=rand()*Math.PI;
+            ctx.save(); ctx.translate(sx,sy); ctx.rotate(rot);
+            ctx.beginPath(); ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
+            ctx.fillStyle=`rgba(120,128,140,${Math.min(1,0.45*im)})`; ctx.fill();
+            ctx.strokeStyle=`rgba(70,78,92,${Math.min(1,0.7*im)})`; ctx.lineWidth=0.7; ctx.stroke();
+            // highlight
+            ctx.beginPath(); ctx.ellipse(-rx*0.3,-ry*0.3,rx*0.3,ry*0.25,0,0,Math.PI*2);
+            ctx.fillStyle=`rgba(255,255,255,${Math.min(1,0.25*im)})`; ctx.fill();
+            ctx.restore();
+        }
+    }
+    ctx.restore(); // close the clip region opened at the top of drawTextureOverlay
+}
+
+
 /**
  * Project a borehole's coordinates onto the transect axis,
  * returning a scalar distance from the first borehole.
@@ -799,15 +1845,32 @@ function parseJSON(text, filename) {
   return {
     id, x, y, z: isNaN(z) ? null : z,
     crs: coords.crs || '',
-    layers: p.layers.map(l => ({
-      depthFrom:    l.depthFrom,
-      depthTo:      l.depthTo,
-      color:        l.color || '#cccccc',
-      officialDesc: l.officialDesc || '-',
-      originalDesc: l.originalDesc || '',
-      markers:      l.markers || [],
-      layerType:    l.layerType || 'normal',
-    })),
+    layers: p.layers.map(l => {
+      const originalDesc = l.originalDesc || '';
+      // Grade fields: prefer the explicit structured values; if missing but the
+      // description carries a " → <base>" clause, reconstruct them so older
+      // exports still render the gradational shift.
+      let gradeTo = (l.gradeTo && typeof petroLookupPrimary === 'function' && petroLookupPrimary(l.gradeTo)) ? l.gradeTo : null;
+      let gradeSecondaries = (gradeTo && Array.isArray(l.gradeSecondaries))
+        ? l.gradeSecondaries.filter(c => typeof petroLookupSecondary === 'function' && petroLookupSecondary(c))
+        : [];
+      if (!gradeTo && originalDesc.indexOf('→') !== -1 && typeof classifyGradeCodes === 'function') {
+        const g = classifyGradeCodes(originalDesc.slice(originalDesc.indexOf('→') + 1).trim());
+        gradeTo = g.gradeTo; gradeSecondaries = g.gradeSecondaries;
+      }
+      return {
+        depthFrom:    l.depthFrom,
+        depthTo:      l.depthTo,
+        color:        l.color || '#cccccc',
+        officialDesc: (l.officialDesc && l.officialDesc !== '-') ? l.officialDesc
+                       : (typeof translateSoil === 'function' ? translateSoil(originalDesc) : '-'),
+        originalDesc,
+        markers:      Array.isArray(l.markers) ? l.markers : [],
+        layerType:    l.layerType || 'normal',
+        gradeTo,
+        gradeSecondaries,
+      };
+    }),
     compactions: p.compactions || [],
     filename
   };
@@ -851,8 +1914,20 @@ function parseTSV(text, filename) {
     const markers=[];
     if (iMk!==-1 && c[iMk] && c[iMk].trim()!=='-') {
       for (const mk of c[iMk].split(';')) {
-        const m=mk.trim().match(/^(.+)\(([0-9.]+)\)$/);
-        if (m) markers.push({label:m[1].trim(), depth:parseFloat(m[2])});
+        const raw = mk.trim(); if (!raw) continue;
+        // CoreLogger format: label[findType](from-to)  OR  label[findType](depth)
+        // Falls back to the old label(depth) form.
+        const m = raw.match(/^(.+?)(?:\[([^\]]+)\])?\(([0-9.]+(?:\s*-\s*[0-9.]+)?)\)$/);
+        if (m) {
+          const label = m[1].trim();
+          const findType = m[2] ? m[2].trim() : null;
+          const ds = m[3].trim();
+          const range = ds.match(/^([0-9.]+)\s*-\s*([0-9.]+)$/);
+          const marker = { label, depth: parseFloat(range ? range[1] : ds) };
+          if (range) marker.depthTo = parseFloat(range[2]);
+          if (findType) marker.findType = findType;
+          markers.push(marker);
+        }
       }
     }
     if (iCp!==-1 && c[iCp] && c[iCp].trim()!=='-') {
@@ -862,12 +1937,31 @@ function parseTSV(text, filename) {
       }
     }
 
+    const originalDesc = (iDesc!==-1?c[iDesc]:'').trim();
+    const importedClass = (iClass!==-1 ? (c[iClass]||'').trim() : '');
+    // Reconstruct gradational shift from the " → <base soil>" clause in the
+    // description (the only place TXT/CSV carries it).
+    let gradeTo = null, gradeSecondaries = [];
+    if (originalDesc.indexOf('→') !== -1 && typeof classifyGradeCodes === 'function') {
+      const g = classifyGradeCodes(originalDesc.slice(originalDesc.indexOf('→') + 1).trim());
+      gradeTo = g.gradeTo; gradeSecondaries = g.gradeSecondaries;
+    }
+    // officialDesc: prefer the Class column; otherwise classify the TOP soil.
+    let officialDesc = (importedClass && importedClass !== '-') ? importedClass
+                       : (typeof translateSoil === 'function' ? translateSoil(originalDesc) : '-');
+    // Layer type from description badges (CoreLogger writes these flags).
+    let layerType = 'normal';
+    if (/disturbed|reworked/i.test(originalDesc))     layerType = 'disturbed';
+    if (/core loss|missing|gap/i.test(originalDesc))  layerType = 'missing';
+    if (/anthropogenic/i.test(originalDesc))          layerType = 'anthropogenic';
+
     layers.push({
       depthFrom: df, depthTo: dt,
       color:        (iColor!==-1?c[iColor]:'#cccccc').trim()||'#cccccc',
-      officialDesc: (iClass!==-1?c[iClass]:'-').trim()||'-',
-      originalDesc: (iDesc!==-1?c[iDesc]:'').trim(),
-      markers, layerType:'normal'
+      officialDesc,
+      originalDesc,
+      markers, layerType,
+      gradeTo, gradeSecondaries
     });
   }
   if (!layers.length) throw new Error('No valid rows');
@@ -927,6 +2021,7 @@ function renderSidebar() {
 
     const strip = document.createElement('div');
     strip.className = 'bh-layers-strip';
+    strip.title = 'Click to edit layer colours';
     const total = bh.layers.reduce((s,l)=>s+(l.depthTo-l.depthFrom),0)||1;
     bh.layers.forEach(l => {
       const seg = document.createElement('div');
@@ -935,6 +2030,7 @@ function renderSidebar() {
       seg.style.height = ((l.depthTo-l.depthFrom)/total*28)+'px';
       strip.appendChild(seg);
     });
+    strip.addEventListener('click', () => openLayerEditor(idx));
 
     const info = document.createElement('div');
     info.className = 'bh-info';
@@ -982,6 +2078,7 @@ function draw() {
   const showMarkers    = document.getElementById('showMarkers').checked;
   const showCompaction = document.getElementById('showCompaction').checked;
   const showLabels     = document.getElementById('showLabels').checked;
+  const showTexture    = document.getElementById('showTexture')?.checked ?? true;
   const showDepthAxis  = document.getElementById('showDepthAxis').checked;
   const showGrid       = document.getElementById('showGrid').checked;
   const showElevAlign  = document.getElementById('showElevAlign').checked;
@@ -1251,11 +2348,11 @@ function draw() {
         const y1 = depthToY(layer.depthFrom, bh);
         const y2 = depthToY(layer.depthTo, bh);
         ctx.save();
-        ctx.strokeStyle = '#2d4e56';
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#e8720c';
+        ctx.lineWidth = 6;
         ctx.setLineDash([]);
         ctx.strokeRect(x + 1, y1 + 1, bhColW - 2, (y2 - y1) - 2);
-        ctx.fillStyle = 'rgba(45,78,86,0.18)';
+        ctx.fillStyle = 'rgba(232,114,12,0.18)';
         ctx.fillRect(x + 1, y1 + 1, bhColW - 2, (y2 - y1) - 2);
         ctx.restore();
       });
@@ -1299,6 +2396,61 @@ function draw() {
       grad.addColorStop(1,   'rgba(0,0,0,.12)');
       ctx.fillStyle = grad;
       ctx.fillRect(x, y1, bhColW, h);
+
+      // ── Grain-size texture (sand/silt/clay/gravel ornament) ──
+      // Mirrors the CoreLogger: for a gradational layer the texture cross-
+      // fades from the top soil to the base soil down the column; clipped
+      // to the (fixed-width) layer rect so it never bleeds past the edges.
+      if (showTexture && l.layerType !== 'missing') {
+        const topCode = (typeof layerMainCode === 'function') ? layerMainCode(l) : null;
+        const botCode = l.gradeTo || topCode;
+        ctx.save();
+        ctx.beginPath(); ctx.rect(x, y1, bhColW, h); ctx.clip();
+        if (!l.gradeTo || botCode === topCode) {
+          drawGrainTexture(ctx, topCode, x, y1, bhColW, h, 1);
+        } else {
+          const bands = Math.max(4, Math.min(16, Math.round(h / 10)));
+          const bh2 = h / bands;
+          for (let bi = 0; bi < bands; bi++) {
+            const f  = (bi + 0.5) / bands;
+            const by = y1 + bi * bh2;
+            drawGrainTexture(ctx, topCode, x, by, bhColW, bh2 + 0.6, 1 - f);
+            drawGrainTexture(ctx, botCode, x, by, bhColW, bh2 + 0.6, f);
+          }
+        }
+        ctx.restore();
+      }
+
+      // ── Find / observation textures (from structured markers) ──
+      // These visualise the same finds as the marker flags, so they are tied
+      // to BOTH the texture layer (showTexture) AND the markers toggle
+      // (showMarkers): unchecking "Markers & horizon indicators" hides them.
+      // Drawn at 60% opacity and clipped to the layer rect.
+      if (showTexture && showMarkers && Array.isArray(l.markers)) {
+        l.markers.forEach(m => {
+          if (!m.findType) return;
+          const typeDesc = {
+            shells:'shells abundant', charcoal:'charcoal abundant', wood:'wood abundant',
+            ceramics:'ceramics abundant', humic:'humic abundant', roots:'roots abundant',
+            stones:'stones abundant', ironoxide:'iron oxide abundant'
+          }[m.findType] || m.label;
+          const fy1 = depthToY(m.depth, bh);
+          let fy2, fyTop, fh;
+          if (m.depthTo != null) {
+            fy2 = depthToY(m.depthTo, bh);
+            fyTop = Math.min(fy1, fy2); fh = Math.abs(fy2 - fy1);
+          } else {
+            const band = 22;
+            fyTop = Math.max(fy1 - band/2, y1); fh = Math.min(band, y2 - fyTop);
+          }
+          if (fh <= 0) return;
+          ctx.save();
+          ctx.globalAlpha = 0.6;
+          ctx.beginPath(); ctx.rect(x, y1, bhColW, h); ctx.clip();   // never leave the layer
+          drawTextureOverlay(ctx, typeDesc, x + 1, fyTop, bhColW - 2, fh);
+          ctx.restore();
+        });
+      }
 
       // Disturbed hatch
       if (l.layerType === 'disturbed') {
@@ -1345,7 +2497,7 @@ function draw() {
 
       // Layer label
       if (showLabels && h > 10) {
-        const label = l.officialDesc && l.officialDesc !== '-' ? l.officialDesc : '';
+        const label = displayCode(l);
         if (label) {
           ctx.save();
           ctx.font = `600 ${Math.min(9,h*0.45)}px "JetBrains Mono"`;
@@ -1478,8 +2630,9 @@ function buildLegend(ordered) {
   const seen = new Map();
   ordered.forEach(bh => {
     bh.layers.forEach(l => {
-      const key = l.officialDesc + '|' + l.color;
-      if (!seen.has(key)) seen.set(key, { label: l.officialDesc, color: l.color });
+      const dc = displayCode(l) || l.officialDesc;
+      const key = dc + '|' + l.color;
+      if (!seen.has(key)) seen.set(key, { label: dc, color: l.color });
     });
   });
   seen.forEach(({label, color}) => {
@@ -1603,7 +2756,7 @@ canvas.addEventListener('mousemove', e => {
     const l = hit.layer;
     tooltip.innerHTML = `<span class="tt-color" style="background:${l.color}"></span><strong>${hit.bh.id}</strong><br>
 ${l.depthFrom.toFixed(2)}–${l.depthTo.toFixed(2)} m<br>
-Class: <strong>${l.officialDesc}</strong><br>
+Class: <strong>${displayCode(l) || l.officialDesc}</strong><br>
 ${l.originalDesc || ''}`;
     tooltip.style.display = 'block';
     tooltip.style.left = (e.clientX + 14) + 'px';
@@ -1676,7 +2829,7 @@ document.getElementById('depthRange').addEventListener('input', e => {
 });
 
 // Checkboxes
-['showInterpol', 'showMarkers', 'showCompaction', 'showLabels', 'showDepthAxis', 'showGrid', 'showElevAlign']
+['showInterpol', 'showMarkers', 'showCompaction', 'showLabels', 'showTexture', 'showDepthAxis', 'showGrid', 'showElevAlign']
   .forEach(id => document.getElementById(id).addEventListener('change', draw));
 
 // ═══════════════════════════════════════════════════════════
@@ -1723,13 +2876,16 @@ function updateCorrUI() {
   const btnOk     = document.getElementById('btnCorrConfirm');
   const btnCancel = document.getElementById('btnCorrCancel');
   const btnClear  = document.getElementById('btnCorrClearAll');
+  const colorRow  = document.getElementById('corrColorRow');
 
   if (!corrMode) {
     status.textContent = 'Correlation mode off.';
     btnOk.style.display = btnCancel.style.display = 'none';
+    colorRow.style.display = 'none';
   } else if (pendingSelection.size === 0) {
     status.innerHTML = 'Click layers in any core to select them. You can select multiple layers per core.';
     btnOk.style.display = btnCancel.style.display = 'none';
+    colorRow.style.display = 'none';
   } else {
     // Build a summary: "CoreA (3 layers) → CoreB (2 layers)"
     const parts = [];
@@ -1744,6 +2900,27 @@ function updateCorrUI() {
                        '<br>Press Connect when ready.');
     btnOk.style.display  = coreCount >= 2 ? 'block' : 'none';
     btnCancel.style.display = 'block';
+
+    // Show color picker when ready to connect; seed with first selected layer color
+    if (coreCount >= 2) {
+      colorRow.style.display = 'flex';
+      // Only seed the color picker when selection changes (don't overwrite user's choice)
+      const firstEntry = pendingSelection.entries().next().value;
+      if (firstEntry) {
+        const [bhUid, layerSet] = firstEntry;
+        const bh = boreholes.find(b => b._uid === bhUid);
+        const firstLi = layerSet.values().next().value;
+        const seedColor = bh?.layers[firstLi]?.color ?? '#888888';
+        const picker = document.getElementById('corrColorPicker');
+        // Only seed if the picker hasn't been manually changed this selection
+        if (!picker.dataset.userSet) {
+          picker.value = seedColor;
+          document.getElementById('corrColorPreview').style.background = seedColor;
+        }
+      }
+    } else {
+      colorRow.style.display = 'none';
+    }
   }
 
   btnClear.style.display = manualConnections.length > 0 ? 'block' : 'none';
@@ -1752,15 +2929,10 @@ function updateCorrUI() {
 
 function confirmConnection() {
   if (pendingSelection.size < 2) return;
-  // Use colour of the first selected layer in the first core
-  let color = '#888888';
-  const firstEntry = pendingSelection.entries().next().value;
-  if (firstEntry) {
-    const [bhUid, layerSet] = firstEntry;
-    const bh = boreholes.find(b => b._uid === bhUid);
-    const firstLi = layerSet.values().next().value;
-    color = bh?.layers[firstLi]?.color ?? color;
-  }
+
+  // Use the user-chosen color from the picker
+  const picker = document.getElementById('corrColorPicker');
+  const color  = picker.value || '#888888';
 
   const sides = [];
   pendingSelection.forEach((layerSet, bhUid) => {
@@ -1769,12 +2941,24 @@ function confirmConnection() {
 
   manualConnections.push({ sides, color });
   pendingSelection = new Map();
+
+  // Reset user-set flag and color picker for next selection
+  picker.dataset.userSet = '';
+  picker.value = '#888888';
+  document.getElementById('corrColorPreview').style.background = '#888888';
+  document.getElementById('corrColorRow').style.display = 'none';
+
   updateCorrUI();
   draw();
 }
 
 function cancelSelection() {
   pendingSelection = new Map();
+  const picker = document.getElementById('corrColorPicker');
+  picker.dataset.userSet = '';
+  picker.value = '#888888';
+  document.getElementById('corrColorPreview').style.background = '#888888';
+  document.getElementById('corrColorRow').style.display = 'none';
   updateCorrUI();
   draw();
 }
@@ -1805,9 +2989,21 @@ function renderCorrList() {
     const item = document.createElement('div');
     item.className = 'corr-conn-item';
     item.innerHTML = `
-      <div class="corr-conn-swatch" style="background:${conn.color}"></div>
+      <div class="corr-conn-swatch" title="Click to change colour" style="background:${conn.color}">
+        <input type="color" value="${conn.color}" data-idx="${idx}">
+      </div>
       <div class="corr-conn-label" title="${label}">${label}</div>
       <button class="corr-conn-del" title="Remove" onclick="removeConnection(${idx})">✕</button>`;
+
+    // Wire the inline color picker for existing connections
+    const inp = item.querySelector('input[type="color"]');
+    inp.addEventListener('input', e => {
+      const i = parseInt(e.target.dataset.idx);
+      manualConnections[i].color = e.target.value;
+      item.querySelector('.corr-conn-swatch').style.background = e.target.value;
+      draw();
+    });
+
     el.appendChild(item);
   });
 }
@@ -1881,6 +3077,60 @@ canvas.addEventListener('click', e => {
 
   updateCorrUI();
   draw();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CORRELATION COLOR PICKER WIRING
+// ═══════════════════════════════════════════════════════════
+document.getElementById('corrColorPicker').addEventListener('input', e => {
+  const color = e.target.value;
+  e.target.dataset.userSet = '1';
+  document.getElementById('corrColorPreview').style.background = color;
+});
+
+// ═══════════════════════════════════════════════════════════
+//  LAYER COLOR EDITOR
+// ═══════════════════════════════════════════════════════════
+function openLayerEditor(bhIdx) {
+  const bh = boreholes[bhIdx];
+  if (!bh) return;
+  document.getElementById('layerEditorTitle').textContent = `Edit Layers — ${bh.id}`;
+  const list = document.getElementById('layerEditorList');
+  list.innerHTML = '';
+  bh.layers.forEach((layer, li) => {
+    const row = document.createElement('div');
+    row.className = 'layer-editor-row';
+    row.innerHTML = `
+      <div class="layer-editor-swatch" title="Click to change colour" style="background:${layer.color}">
+        <input type="color" value="${layer.color}" data-bh="${bhIdx}" data-li="${li}">
+      </div>
+      <div class="layer-editor-info">
+        <div class="layer-editor-depth">${layer.depthFrom.toFixed(2)}–${layer.depthTo.toFixed(2)} m</div>
+        <div class="layer-editor-desc">${displayCode(layer) || '(no classification)'}</div>
+      </div>`;
+
+    const inp = row.querySelector('input[type="color"]');
+    inp.addEventListener('input', e => {
+      const bi  = parseInt(e.target.dataset.bh);
+      const lii = parseInt(e.target.dataset.li);
+      boreholes[bi].layers[lii].color = e.target.value;
+      row.querySelector('.layer-editor-swatch').style.background = e.target.value;
+      renderSidebar();
+      draw();
+    });
+
+    list.appendChild(row);
+  });
+  document.getElementById('layerEditorBackdrop').style.display = 'flex';
+}
+
+function closeLayerEditor() {
+  document.getElementById('layerEditorBackdrop').style.display = 'none';
+}
+
+// Close on backdrop click
+document.getElementById('layerEditorBackdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('layerEditorBackdrop')) closeLayerEditor();
 });
 
 // ═══════════════════════════════════════════════════════════
