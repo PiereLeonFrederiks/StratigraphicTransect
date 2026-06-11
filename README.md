@@ -18,12 +18,18 @@ DOI: https://doi.org/10.5281/zenodo.20487142
 - Import **Core Logger JSON** (full session profiles) or **TXT / TSV / CSV** exports
 - Drag-and-drop or file picker; **multiple files at once** are supported
 - Each loaded profile appears in the sidebar borehole list and can be individually toggled
+- Reads the full Core Logger export — including gradational layers, find markers (with type and depth range), and Munsell-mapped colours — and reconstructs gradational shifts from TXT/CSV when needed
 
 ### Transect Visualisation
 - Renders all boreholes as a side-by-side stratigraphic cross-section on an HTML5 canvas
 - Borehole positions are ordered spatially by **perspective direction** (N / S / W / E) based on their GPS coordinates — left-to-right order reflects real-world geometry along the chosen axis
 - **Absolute elevation alignment** (m a.s.l.) when surface elevation data is present, so stratigraphic contacts can be visually correlated across uneven terrain
-- Soil layers rendered in their logged colours with Munsell-mapped tones; layer classification codes shown as labels
+- Soil layers rendered in their logged colours with Munsell-mapped tones; layer classification codes shown as labels, including gradational shifts displayed as `X → Y` (e.g. `U(l) → T(g)`)
+
+### Lithology & Find Textures
+- Grain-size **lithology textures** (sand / silt / clay / gravel / peat ornaments) drawn inside each column, cross-fading from top to base for gradational layers
+- **Find textures** (shells, charcoal, wood, ceramics, humic, roots, stones, iron oxide) rendered semi-transparently over the lithology, clipped to the layer so the grain stays visible underneath
+- Toggleable as a group via **Lithology & find textures**; find textures also follow the **Markers & horizon indicators** toggle, since they visualise the same finds
 
 ### 3D Offset Rendering
 - Adjustable **3D offset depth** gives each borehole column a pseudo-3D extruded appearance for improved readability in printed figures
@@ -31,6 +37,7 @@ DOI: https://doi.org/10.5281/zenodo.20487142
 ### Overlays (all toggleable)
 - Manual correlation lines
 - Markers and horizon indicators
+- Lithology & find textures
 - Compaction zones
 - Layer classification labels
 - Depth axis and scale bar
@@ -53,7 +60,7 @@ DOI: https://doi.org/10.5281/zenodo.20487142
 ### Export
 - **PNG** — raster image at paper dimensions
 - **JPG** — compressed raster
-- **SVG** — scalable vector for further editing in Inkscape, Illustrator, etc.
+- **SVG** — scalable wrapper around the rendered profile for further editing in Inkscape, Illustrator, etc.
 
 ---
 
@@ -78,6 +85,8 @@ DOI: https://doi.org/10.5281/zenodo.20487142
 
 Coordinates (longitude/latitude/elevation) embedded in the profile are used to position boreholes spatially. Profiles without coordinates are placed at the origin and spaced evenly.
 
+JSON is the recommended (lossless) format and preserves every field, including gradational shifts and finds. TXT/CSV imports reconstruct gradational shifts from the description and re-read finds with their type and depth range, so an exported log re-imports faithfully.
+
 ---
 
 ## Companion Tool
@@ -94,6 +103,8 @@ This viewer is an addon to the **Geoarchaeological Core Logger** (`index.html`),
 | Firefox (desktop) | ✅ Full |
 | Safari (macOS) | ✅ Full |
 | Mobile browsers | ⚠ Functional; optimised for desktop use |
+
+The classifier and import logic use modern JavaScript (lookbehind regular expressions); very old browsers (pre-2018) are not supported.
 
 ---
 
