@@ -838,6 +838,15 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
     <!-- Export -->
     <div class="sidebar-section">
       <div class="sec-label">Export</div>
+      <div class="checkbox-row" style="gap:8px;align-items:center;">
+        <label for="exportDPI" style="white-space:nowrap;">Resolution</label>
+        <select id="exportDPI" style="flex:1;">
+          <option value="96">96 dpi (screen)</option>
+          <option value="150">150 dpi</option>
+          <option value="300" selected>300 dpi (print)</option>
+          <option value="600">600 dpi (poster)</option>
+        </select>
+      </div>
       <div class="export-row">
         <button class="btn-export primary" onclick="exportAs('png')">PNG</button>
         <button class="btn-export" onclick="exportAs('jpg')">JPG</button>
@@ -2063,16 +2072,26 @@ function getOrderedBoreholes() {
 // ═══════════════════════════════════════════════════════════
 const canvas = document.getElementById('transectCanvas');
 const ctx    = canvas.getContext('2d');
+window.__screenCtx = ctx;   // default render target for draw()
 
 const PAD_LEFT   = 80;
 const PAD_RIGHT  = 190;
 const PAD_TOP    = 110;
 const PAD_BOTTOM = 90;
 
-function draw() {
+function draw(_targetCtx, _scale, _mode) {
+  // Render target indirection: by default we draw to the on-screen canvas/ctx.
+  // Exports pass an offscreen hi-DPI context (raster) or an SVG recorder
+  // (vector). `scale` multiplies the paper size for high-DPI raster output;
+  // `mode` is 'rec' when the target only records vector primitives.
+  const scale  = _scale || 1;
+  const isRec  = _mode === 'rec';
+  const ctx    = _targetCtx || window.__screenCtx;
+  const canvas = ctx.canvas;
+
   const ordered = getOrderedBoreholes();
   const noData  = document.getElementById('noDataOverlay');
-  noData.style.display = ordered.length ? 'none' : 'flex';
+  if (noData) noData.style.display = ordered.length ? 'none' : 'flex';
 
   const showInterpol   = document.getElementById('showInterpol').checked;
   const showMarkers    = document.getElementById('showMarkers').checked;
@@ -2085,21 +2104,26 @@ function draw() {
 
   if (!ordered.length) {
     canvas.width = 800; canvas.height = 500;
+    if (ctx.resetTransform) ctx.resetTransform();
     ctx.clearRect(0,0,canvas.width,canvas.height);
     updateInfo(ordered);
     return;
   }
 
-  // ── Paper canvas size ──
+  // ── Paper canvas size (× scale for hi-DPI export) ──
   const paper = getPaperPx();
-  canvas.width  = paper.w;
-  canvas.height = paper.h;
+  canvas.width  = Math.round(paper.w * scale);
+  canvas.height = Math.round(paper.h * scale);
+  // All layout below is in logical (96-dpi) paper coordinates; scale the
+  // context so a hi-DPI raster is simply a magnified copy.
+  if (ctx.setTransform) ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
-  // Update label
+  // Update label (only meaningful for the on-screen canvas)
   const s = PAPER_SIZES[paperSize];
   const wMM = paperOrient==='landscape' ? s.w : s.h;
   const hMM = paperOrient==='landscape' ? s.h : s.w;
-  document.getElementById('paperDimsLabel').textContent =
+  const dimsLabel = document.getElementById('paperDimsLabel');
+  if (dimsLabel && !_targetCtx) dimsLabel.textContent =
     `${wMM} × ${hMM} mm · 96 dpi · ${paper.w}×${paper.h}px`;
 
   // ── Vertical extents ──
@@ -2401,7 +2425,7 @@ function draw() {
       // Mirrors the CoreLogger: for a gradational layer the texture cross-
       // fades from the top soil to the base soil down the column; clipped
       // to the (fixed-width) layer rect so it never bleeds past the edges.
-      if (showTexture && l.layerType !== 'missing') {
+      if (showTexture && !isRec && l.layerType !== 'missing') {
         const topCode = (typeof layerMainCode === 'function') ? layerMainCode(l) : null;
         const botCode = l.gradeTo || topCode;
         ctx.save();
@@ -2426,7 +2450,7 @@ function draw() {
       // to BOTH the texture layer (showTexture) AND the markers toggle
       // (showMarkers): unchecking "Markers & horizon indicators" hides them.
       // Drawn at 60% opacity and clipped to the layer rect.
-      if (showTexture && showMarkers && Array.isArray(l.markers)) {
+      if (showTexture && showMarkers && !isRec && Array.isArray(l.markers)) {
         l.markers.forEach(m => {
           if (!m.findType) return;
           const typeDesc = {
@@ -2662,28 +2686,146 @@ function updateInfo(ordered) {
 // ═══════════════════════════════════════════════════════════
 //  EXPORT
 // ═══════════════════════════════════════════════════════════
+//  EXPORT  (DPI-aware raster + true-vector SVG)
+// ═══════════════════════════════════════════════════════════
+function getExportDPI() {
+  const v = parseInt(document.getElementById('exportDPI')?.value || '96', 10);
+  return (isFinite(v) && v > 0) ? v : 96;
+}
+
+// Render the whole scene to a hi-DPI offscreen canvas. `suppressText` omits
+// text so it can be supplied as crisp vector instead (used for SVG export).
+function renderRaster(scale, suppressText) {
+  const off = document.createElement('canvas');
+  const realCtx = off.getContext('2d');
+  let target = realCtx;
+  if (suppressText) {
+    target = new Proxy(realCtx, {
+      get(t, p) {
+        if (p === 'fillText' || p === 'strokeText') return () => {};
+        const v = t[p];
+        return (typeof v === 'function') ? v.bind(t) : v;
+      },
+      set(t, p, v) { t[p] = v; return true; }
+    });
+  }
+  draw(target, scale);
+  return off;
+}
+
+// Minimal canvas-2D-compatible recorder that captures the vector primitives
+// draw() emits (text + strokes/outlines) as SVG. Fills, arcs and textures are
+// ignored here — they live in the hi-DPI raster layer underneath.
+function makeSVGRecorder(scale) {
+  const out = [];
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const st = { fillStyle:'#000', strokeStyle:'#000', lineWidth:1, font:'10px sans-serif',
+               textAlign:'left', textBaseline:'alphabetic', globalAlpha:1, lineDash:[] };
+  const stack = [];
+  // current transform: only translate/scale used by draw()
+  let tx = 0, ty = 0, sx = scale, sy = scale;
+  const X = x => (x * sx + tx), Y = y => (y * sy + ty);
+  let path = [];
+  function fontSize() { const m = /(\d+(\.\d+)?)px/.exec(st.font); return m ? parseFloat(m[1])*sx : 10*sx; }
+  function fontWeight() { return /bold/i.test(st.font) ? ' font-weight="bold"' : ''; }
+  function anchor() { return st.textAlign==='center'?'middle':st.textAlign==='right'?'end':'start'; }
+  function baseline() {
+    if (st.textBaseline==='middle') return 'central';
+    if (st.textBaseline==='top' || st.textBaseline==='hanging') return 'hanging';
+    return 'alphabetic';
+  }
+  const rec = {
+    canvas: { width: 0, height: 0, getContext(){ return rec; } },
+    set fillStyle(v){ st.fillStyle=v; } , get fillStyle(){ return st.fillStyle; },
+    set strokeStyle(v){ st.strokeStyle=v; }, get strokeStyle(){ return st.strokeStyle; },
+    set lineWidth(v){ st.lineWidth=v; }, get lineWidth(){ return st.lineWidth; },
+    set font(v){ st.font=v; }, get font(){ return st.font; },
+    set textAlign(v){ st.textAlign=v; }, get textAlign(){ return st.textAlign; },
+    set textBaseline(v){ st.textBaseline=v; }, get textBaseline(){ return st.textBaseline; },
+    set globalAlpha(v){ st.globalAlpha=v; }, get globalAlpha(){ return st.globalAlpha; },
+    set lineCap(v){}, get lineCap(){ return 'butt'; },
+    set lineJoin(v){}, get lineJoin(){ return 'miter'; },
+    setTransform(a,b,c,d,e,f){ sx=a; sy=d; tx=e; ty=f; },
+    resetTransform(){ sx=scale; sy=scale; tx=0; ty=0; },
+    save(){ stack.push({...st, tx,ty,sx,sy}); },
+    restore(){ const s=stack.pop(); if(s){ Object.assign(st,s); tx=s.tx;ty=s.ty;sx=s.sx;sy=s.sy; } },
+    translate(x,y){ tx += x*sx; ty += y*sy; },
+    scale(a,b){ sx*=a; sy*=b; },
+    rotate(){ /* not used by text/line layer */ },
+    setLineDash(d){ st.lineDash = d||[]; },
+    beginPath(){ path=[]; },
+    moveTo(x,y){ path.push(['M',X(x),Y(y)]); },
+    lineTo(x,y){ path.push(['L',X(x),Y(y)]); },
+    bezierCurveTo(){ /* skip (textures only) */ },
+    arc(){}, ellipse(){}, rect(){}, clip(){}, closePath(){ path.push(['Z']); },
+    fill(){ /* fills handled by raster */ },
+    fillRect(){}, strokeRect(x,y,w,h){
+      const d=`M${X(x)} ${Y(y)} H${X(x+w)} V${Y(y+h)} H${X(x)} Z`;
+      out.push(`<path d="${d}" fill="none" stroke="${st.strokeStyle}" stroke-width="${(st.lineWidth*sx).toFixed(2)}" opacity="${st.globalAlpha}"/>`);
+    },
+    clearRect(){},
+    stroke(){
+      if (!path.length) return;
+      let d='';
+      for (const seg of path){ if(seg[0]==='M') d+=`M${seg[1].toFixed(2)} ${seg[2].toFixed(2)} `; else if(seg[0]==='L') d+=`L${seg[1].toFixed(2)} ${seg[2].toFixed(2)} `; else d+='Z '; }
+      const dash = st.lineDash && st.lineDash.length ? ` stroke-dasharray="${st.lineDash.map(v=>(v*sx).toFixed(2)).join(',')}"` : '';
+      out.push(`<path d="${d.trim()}" fill="none" stroke="${st.strokeStyle}" stroke-width="${(st.lineWidth*sx).toFixed(2)}" opacity="${st.globalAlpha}"${dash}/>`);
+    },
+    fillText(text,x,y){
+      if (text==null || text==='') return;
+      out.push(`<text x="${X(x).toFixed(1)}" y="${Y(y).toFixed(1)}" font-size="${fontSize().toFixed(1)}"${fontWeight()} fill="${st.fillStyle}" text-anchor="${anchor()}" dominant-baseline="${baseline()}" font-family="-apple-system,Segoe UI,Roboto,sans-serif">${esc(text)}</text>`);
+    },
+    strokeText(text,x,y){ rec.fillText(text,x,y); },
+    measureText(t){ return { width: String(t).length * fontSize()*0.55/sx }; },
+    createLinearGradient(){ return { addColorStop(){} }; },
+    createRadialGradient(){ return { addColorStop(){} }; },
+    drawImage(){},
+    _svgBody(){ return out.join('\n'); }
+  };
+  return rec;
+}
+
 function exportAs(fmt) {
   if (!boreholes.length) { alert('No data to export.'); return; }
+  const dpi   = getExportDPI();
+  const scale = dpi / 96;
+  const stamp = `${dpi}dpi-${Date.now()}`;
 
   if (fmt === 'svg') {
-    const dataURL = canvas.toDataURL('image/png');
-    const svgStr = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
-  <image href="${dataURL}" width="${canvas.width}" height="${canvas.height}"/>
+    // Hi-DPI raster carries fills + textures (no text); vector layer carries
+    // crisp text + outlines on top.
+    const raster = renderRaster(scale, true);
+    const dataURL = raster.toDataURL('image/png');
+    const rec = makeSVGRecorder(scale);
+    draw(rec, scale, 'rec');
+    const W = raster.width, H = raster.height;
+    const svgStr =
+`<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <image x="0" y="0" width="${W}" height="${H}" xlink:href="${dataURL}"/>
+  <g>
+${rec._svgBody()}
+  </g>
 </svg>`;
-    const blob = new Blob([svgStr], {type:'image/svg+xml'});
-    triggerDL(blob, `transect-${Date.now()}.svg`);
+    triggerDL(new Blob([svgStr], {type:'image/svg+xml'}), `transect-${stamp}.svg`);
+    draw(); // restore the on-screen canvas
     return;
   }
 
-  const offCanvas = document.createElement('canvas');
-  offCanvas.width  = canvas.width;
-  offCanvas.height = canvas.height;
-  const offCtx = offCanvas.getContext('2d');
-  if (fmt === 'jpg') { offCtx.fillStyle = '#ffffff'; offCtx.fillRect(0,0,offCanvas.width,offCanvas.height); }
-  offCtx.drawImage(canvas, 0, 0);
-  const mime = fmt === 'jpg' ? 'image/jpeg' : 'image/png';
-  offCanvas.toBlob(blob => triggerDL(blob, `transect-${Date.now()}.${fmt}`), mime, .93);
+  // PNG / JPG at chosen DPI (flat raster, text baked in)
+  const raster = renderRaster(scale, false);
+  if (fmt === 'jpg') {
+    // flatten onto white
+    const flat = document.createElement('canvas');
+    flat.width = raster.width; flat.height = raster.height;
+    const fctx = flat.getContext('2d');
+    fctx.fillStyle = '#ffffff'; fctx.fillRect(0,0,flat.width,flat.height);
+    fctx.drawImage(raster, 0, 0);
+    flat.toBlob(b => triggerDL(b, `transect-${stamp}.jpg`), 'image/jpeg', .93);
+  } else {
+    raster.toBlob(b => triggerDL(b, `transect-${stamp}.png`), 'image/png');
+  }
+  draw(); // restore the on-screen canvas
 }
 
 function triggerDL(blob, name) {
