@@ -9,7 +9,7 @@
 
 :root {
   /* Geoarchaeological Core Logger — shared design tokens, kept in sync
-     with the main Core Logger tool (corelogger_index_v0_4_3.html) so this
+     with the main Core Logger tool (corelogger_index_v0_2_0.html) so this
      viewer reads as the same product rather than a separate skin. */
    --ga-void:      #f5f7f8;
   --ga-depth:     linear-gradient(160deg, #eef2f6 0%, #e7edf3 55%, #e1e9f0 100%);
@@ -1396,7 +1396,7 @@ function darken(hex, amt=30) {
   return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-// ===================== PORTED SOIL ENGINE (from CoreLogger v0_1_9) =====================
+// ===================== PORTED SOIL ENGINE (from CoreLogger v0_2_0) =====================
 // Build the displayed KA5 code for a layer, appending the gradational base
 // soil as "X → Y" when the layer has a gradational shift (matches CoreLogger).
 function displayCode(l) {
@@ -2182,7 +2182,7 @@ function gradeBaseCode(l) {
 const CORE_W_REF = 110;
 
 // Width fractions — kept in sync with the Core Logger's own table
-// (corelogger_index_v0_4_3.html). Every grain-size code the primary-soil
+// (corelogger_index_v0_2_0.html). Every grain-size code the primary-soil
 // picker offers gets an explicit entry, including every sub-grade
 // (fT/mT/gT, vfU..vcU, vfS..vcS, vfG..vcG) — a bare-codes-only table would
 // leave every sub-grade falling through to the generic default.
@@ -5349,5 +5349,5 @@ draw();
     With thanks to my colleagues for testing and input
 </p>
 <p style="text-align:center; margin:0 0 16px; font-size:.68rem; font-family:var(--ga-mono, monospace); color:var(--muted,#5c7180);">
-    Reference: Frederiks 2026 &nbsp;·&nbsp; DOI: <a href="https://doi.org/[DOI]" target="_blank" rel="noopener" style="color:var(--ga-accent,#397b88);">https://doi.org/[DOI]</a>
+    Reference: P. L. Frederiks 2026 &nbsp;·&nbsp; DOI: <a href="https://doi.org/[DOI]" target="_blank" rel="noopener" style="color:var(--ga-accent,#397b88);">https://doi.org/[DOI]</a>
 </p>
