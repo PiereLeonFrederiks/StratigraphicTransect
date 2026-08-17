@@ -9,7 +9,7 @@
 
 :root {
   /* Geoarchaeological Core Logger — shared design tokens, kept in sync
-     with the main Core Logger tool (corelogger_index_v0_2_0.html) so this
+     with the main Core Logger tool (corelogger_index_v0_4_3.html) so this
      viewer reads as the same product rather than a separate skin. */
    --ga-void:      #f5f7f8;
   --ga-depth:     linear-gradient(160deg, #eef2f6 0%, #e7edf3 55%, #e1e9f0 100%);
@@ -1396,7 +1396,7 @@ function darken(hex, amt=30) {
   return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-// ===================== PORTED SOIL ENGINE (from CoreLogger v0_2_0) =====================
+// ===================== PORTED SOIL ENGINE (from CoreLogger v0_1_9) =====================
 // Build the displayed KA5 code for a layer, appending the gradational base
 // soil as "X → Y" when the layer has a gradational shift (matches CoreLogger).
 function displayCode(l) {
@@ -2182,7 +2182,7 @@ function gradeBaseCode(l) {
 const CORE_W_REF = 110;
 
 // Width fractions — kept in sync with the Core Logger's own table
-// (corelogger_index_v0_2_0.html). Every grain-size code the primary-soil
+// (corelogger_index_v0_4_3.html). Every grain-size code the primary-soil
 // picker offers gets an explicit entry, including every sub-grade
 // (fT/mT/gT, vfU..vcU, vfS..vcS, vfG..vcG) — a bare-codes-only table would
 // leave every sub-grade falling through to the generic default.
@@ -2258,6 +2258,10 @@ function layerTopBotWidths(l) {
         wBot: Math.round(bhColW * widthFracForCode(botCode)),
     };
 }
+// Traces the trapezoid outline for one layer's tapered body: left edge
+// vertical at the spine (x), right edge slanted from wTop (at y1) to wBot
+// (at y1+h). When wTop === wBot this collapses to an ordinary rectangle,
+// so callers don't need a separate code path for non-tapered layers.
 function layerBodyPath(ctx, x, y1, h, wTop, wBot) {
     ctx.beginPath();
     ctx.moveTo(x, y1);
@@ -2840,6 +2844,15 @@ const PROJECT_CHECKBOX_IDS = [
   'showTotalDepth', 'showDisturbedHatch', 'showTransitions', 'showDepthAxis', 'showGrid', 'showElevAlign'
 ];
 
+// Captures the entire working session as one plain-JSON-serialisable
+// object — every loaded borehole (already includes all its layers,
+// markers, compactions, transitions and units, since they're parsed once
+// at import time and never stored anywhere else), every manual
+// correlation, every legend note, and a `settings` bag mirroring each
+// display-customisation variable plus every overlay checkbox's state
+// (via PROJECT_CHECKBOX_IDS above). Anything added to the app's state
+// later should be added to `settings` here AND restored in
+// applyProjectSnapshot() below — the two are not auto-synced.
 function buildProjectSnapshot() {
   const checks = {};
   PROJECT_CHECKBOX_IDS.forEach(id => {
@@ -2931,6 +2944,15 @@ function syncControlsFromState() {
   });
 }
 
+// The inverse of buildProjectSnapshot(): pushes every saved value back
+// into its matching JS state variable, then calls syncControlsFromState()
+// (below) to update the DOM controls that don't read their state fresh
+// from a variable each draw() — sliders, paper/orientation buttons, colour
+// pickers and the like need to be told explicitly, since nothing here
+// triggers their own change handlers. Every `if (typeof s.x === '...')`
+// guard is deliberately permissive: a project file from an older app
+// version simply won't have some of these fields, and the corresponding
+// setting is left at whatever it already was rather than erroring out.
 function applyProjectSnapshot(snap) {
   if (!snap || snap._projectType !== PROJECT_FILE_TYPE || !Array.isArray(snap.boreholes)) {
     throw new Error("This doesn't look like a saved transect project file.");
@@ -3201,6 +3223,19 @@ function draw(_targetCtx, _scale, _mode, _transparentBg) {
   canvas.height = Math.round(pageH * scale);
   // All layout below is in logical (96-dpi) paper coordinates; scale the
   // context so a hi-DPI raster is simply a magnified copy.
+  //
+  // ⚠️ IMPORTANT — this is the exact spot a serious export bug lived before
+  // v0.2.0: canvas.width/canvas.height above are DEVICE pixels (already
+  // multiplied by `scale`, e.g. ×3.125 at 300dpi), but every layout
+  // calculation from here down — column positions, padding, font sizes,
+  // the works — is written in LOGICAL paper-space px (paper.w/paper.h/
+  // pageH), which setTransform() then scales up uniformly in one place.
+  // Reading canvas.width/canvas.height directly anywhere below this line
+  // instead of paper.w/paper.h/pageH double-applies the DPI factor and
+  // throws the whole layout off — invisible at the default 96dpi (scale=1,
+  // so the bug is a no-op) but silently wrong at any export DPI. If you're
+  // adding new layout code below, always measure against paper.w/paper.h/
+  // pageH, never canvas.width/canvas.height.
   if (ctx.setTransform) ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
   // Update label (only meaningful for the on-screen canvas)
@@ -3260,7 +3295,16 @@ function draw(_targetCtx, _scale, _mode, _transparentBg) {
   const autoHScalePxPerM = availW / transectSpanM;
   const hScalePxPerM = autoHScalePxPerM * hScaleMult;
 
-  // Map each borehole to its X pixel centre position
+  // Maps a borehole's index (in `ordered`, i.e. already sorted left→right
+  // by transect position) to the X pixel centre of its column's LEFT edge
+  // (the "spine" the grain-size taper measures out from). Everything here
+  // is in logical/paper-space px (the same 96dpi-equivalent coordinate
+  // system paper.w/paper.h are expressed in) — never device pixels. The
+  // hi-DPI scale factor is applied once, uniformly, via ctx.setTransform()
+  // near the top of draw(); nothing below this point needs to know or care
+  // what DPI it's ultimately rendered at. (Mixing device-pixel and
+  // logical-px values here was exactly the historic export bug — see the
+  // "Paper canvas size" comment above — so this separation matters.)
   function bhX(i) {
     const tc    = transectCoords[i] - minTC;   // distance from first borehole (m)
     const xBase = PAD_LEFT + tc * hScalePxPerM + offset3D;
@@ -3274,6 +3318,20 @@ function draw(_targetCtx, _scale, _mode, _transparentBg) {
     `Auto: 1m = ${autoHScalePxPerM.toFixed(2)}px  |  ×${hScaleMult.toFixed(2)}`;
 
   // ── Y coordinate helper ──
+  // Two modes, chosen once per draw() call via `hasElev` (true only when
+  // every loaded borehole has a known surface elevation `z`):
+  //   • Elevation-aligned: boreholes are stacked so their absolute
+  //     elevations line up (a core starting higher above sea level draws
+  //     higher on the page), not just their raw depth-from-surface. Depth
+  //     is first converted to this core's own absolute elevation
+  //     (bh.z - depth), then to a page Y via how far below the transect's
+  //     highest point (globalMaxElev) that sits.
+  //   • Simple depth: every core's surface (depth 0) draws at the same Y,
+  //     regardless of real-world elevation — used whenever elevation data
+  //     isn't available for all cores, so mixing them wouldn't be
+  //     meaningful.
+  // `bh` is the specific borehole the depth belongs to (each core can have
+  // its own surface elevation, hence needing it even in elevation mode).
   function depthToY(depth, bh) {
     if (hasElev && bh.z !== null) {
       return PAD_TOP + (globalMaxElev - (bh.z - depth)) * scalePx;
@@ -4544,6 +4602,15 @@ canvas.addEventListener('mousemove', e => {
   const availW = paper.w - PAD_LEFT - PAD_RIGHT - offset3D - ordered.length * bhColW;
   const hScalePxPerM = (availW / transectSpanM) * hScaleMult;
 
+  // Recomputes the same depth↔pixel mapping as draw()'s depthToY(), but
+  // scoped to this mousemove handler instead of a shared/exported helper.
+  // This duplication (also see depthToYLocal() further below, used by the
+  // correlation-mode click handler) is deliberate rather than an oversight:
+  // each of these run outside draw()'s own closure, so they need their own
+  // local copies of the borehole ordering/scale/depth-range setup above
+  // to answer "where on screen is depth X for core Y" independently of
+  // whether draw() has just run. If the coordinate math in depthToY()
+  // ever changes, these two copies need the same change.
   function depthToY2(depth, bh) {
     if (hasElev && bh.z !== null) return PAD_TOP + (globalMaxElev - (bh.z - depth)) * scalePx;
     return PAD_TOP + (depth - globalMinDepth) * scalePx;
@@ -5251,6 +5318,10 @@ canvas.addEventListener('click', e => {
   const availW = paper.w - PAD_LEFT - PAD_RIGHT - offset3D - ordered.length * bhColW;
   const hScalePxPerM = (availW / ((maxTC - minTC) || 1)) * hScaleMult;
 
+  // Third local copy of the depth↔pixel mapping — see the comment on
+  // depthToY2() above (mousemove/tooltip handler) for why this isn't just
+  // one shared function; this one scopes the correlation-mode click
+  // handler's own hit-testing.
   function depthToYLocal(depth, bh) {
     if (hasElev && bh.z !== null) return PAD_TOP + (globalMaxElev - (bh.z - depth)) * scalePx;
     return PAD_TOP + (depth - globalMinDepth) * scalePx;
@@ -5345,9 +5416,10 @@ document.getElementById('layerEditorBackdrop').addEventListener('click', e => {
 draw();
 </script>
 
-<p style="text-align:center; margin:-8px 0 0; font-size:.72rem; font-family:var(--ga-mono); color:var(--ga-subdued);">
+<h6 style="text-align:center;margin:0 0 4px;color:var(--muted,#5c7180);font-family:var(--ga-mono, monospace);font-size:.68rem;font-weight:400;"><small></small></h6>
+<p style="text-align:center; margin:0 0 4px; font-size:.68rem; font-family:var(--ga-mono, monospace); color:var(--muted,#5c7180);">
     With thanks to my colleagues for testing and input
 </p>
 <p style="text-align:center; margin:0 0 16px; font-size:.68rem; font-family:var(--ga-mono, monospace); color:var(--muted,#5c7180);">
-    Reference: P. L. Frederiks 2026 &nbsp;·&nbsp; DOI: <a href="https://doi.org/10.5281/zenodo.21983560" target="_blank" rel="noopener" style="color:var(--ga-accent,#397b88);">https://doi.org/10.5281/zenodo.21983560</a>
+    Reference: P. L. Frederiks &nbsp;·&nbsp; DOI: <a href="https://doi.org/10.5281/zenodo.21983560" target="_blank" rel="noopener" style="color:var(--ga-accent,#397b88);">https://doi.org/10.5281/zenodo.21983560</a>
 </p>
