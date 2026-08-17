@@ -3,65 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stratigraphic Transect Viewer</title>
+<title>Stratigraphic Transect Viewer v0.2.0</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
 :root {
-  /* Geoarchaeological Core Logger - Transect Viewer Light Theme */
-   --ga-void:      #f5f7f8; /* Crisp, ultra-light slate canvas */
-  --ga-depth:     #FFFFFF; /* Soft slate-blue contrast for sidebars/panels */
-  --ga-stratum:   #ffffff; /* Elevated clean white containers/cards */
-  --ga-layer:     #ffffff; /* Pure white for top-level elements */
-  --ga-border:    #d0dadf; /* Clean, non-distracting lines matching the text tones */
-  --ga-muted-bg:  #eef3f5; /* Subtle backdrop for code blocks or data readouts */
-  --ga-paper:     #ffffff; /* Pristine document background */
-  --ga-vellum:    #f7fafb; /* Soft row tint for data tables */
-  --ga-rule:      #dae3e6; /* Sharp divider lines */
-  --ga-text:      #2d3e46; /* Deep slate-teal for high-contrast, soft readability */
-  --ga-subdued:   #5c747f; /* Muted teal-gray for secondary labels and data fields */
-  --ga-faint:     #8fa4ae; /* Taken from 'geoarchaeological' text—for captions & metadata */
-  --ga-ink:       #1c2d35; /* Crisp, near-black slate-teal for bold emphasis */
-  
-  /* Brand Primary Accents (From Logo Typography) */
-  --ga-accent:    #2d4e56; /* The signature deep 'CORE LOGGER' teal */
-  --ga-accent-lt: #426e79; /* Interactive hover states */
-  --ga-accent-dk: #cbd4d6; /* Deep focus states */
-  --ga-accent-bg: rgba(255, 255, 255, 0.06); /* Clean, translucent vector selections */
-  
-  /* Data Vector & Status Indicators (Sampled from the Core Tube) */
-  --ga-green:     #6a8f70; /* Muted sage green for success / feature tracking */
-  --ga-green-bg:  rgba(106, 143, 112, .10);
-  --ga-red:       #b0583c; /* Earthy clay-red for anomalies, boundaries, or alerts */
-  --ga-red-bg:    rgba(176, 88, 60, .10);
-  --ga-blue:      #4a7380; /* Mineral slate-blue for secondary vectors / water tables */
+  /* Geoarchaeological Core Logger — shared design tokens, kept in sync
+     with the main Core Logger tool (corelogger_index_v0_4_3.html) so this
+     viewer reads as the same product rather than a separate skin. */
+   --ga-void:      #f5f7f8;
+  --ga-depth:     linear-gradient(160deg, #eef2f6 0%, #e7edf3 55%, #e1e9f0 100%);
+  --ga-stratum:   #ffffff;
+  --ga-layer:     #ffffff;
+  --ga-border:    #dbe3ea;
+  --ga-muted-bg:  #eef3f5;
+  --ga-paper:     #ffffff;
+  --ga-vellum:    #f7fafb;
+  --ga-rule:      #dae3e6;
+  --ga-text:      #2d3e46;
+  --ga-subdued:   #5c747f;
+  --ga-faint:     #5d7b85;
+  --ga-ink:       #1c2d35;
 
-  /* Typography & Layout Shadows */
-  --ga-sans:      'Inter', system-ui, -apple-system, sans-serif; /* Clean UI legibility */
-  --ga-mono:      'JetBrains Mono', 'Fira Code', monospace; /* For coordinate ticks and depth data */
-  --ga-shadow:    0 1px 2px 0 rgba(45, 78, 86, 0.04), 0 4px 12px 0 rgba(45, 78, 86, 0.02); /* Extremely clean, flat depth */
+  /* Card-style layout tokens — rounded, shadowed "dashboard widget" look,
+     matching the Core Logger's own component scale. */
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    18px;
+  --radius-pill:  999px;
+  --shadow-card:       0 1px 2px rgba(23,43,58,.04), 0 6px 20px -4px rgba(23,43,58,.10);
+  --shadow-card-hover: 0 2px 4px rgba(23,43,58,.06), 0 10px 28px -4px rgba(23,43,58,.14);
+  --shadow-modal:      0 24px 64px -12px rgba(15,28,38,.35);
+
+  /* Brand Primary Accents */
+  --ga-accent:    #397b88;
+  --ga-accent-lt: #4fa3b3;
+  --ga-accent-dk: #2d626c;
+  --ga-accent-bg: rgba(79, 163, 179, .10);
+
+  /* Status Indicators */
+  --ga-green:     #1f9d55;
+  --ga-green-bg:  rgba(31, 157, 85, .12);
+  --ga-red:       #e07353;
+  --ga-red-bg:    rgba(224, 115, 83, .12);
+  --ga-blue:      #689cb0;
+  --ga-blue-bg:   rgba(104, 156, 176, .12);
+  --ga-amber:     #d98c1a;
+  --ga-amber-bg:  rgba(217, 140, 26, .13);
+
+  /* Typography */
+  --ga-sans:      'Inter', system-ui, -apple-system, sans-serif;
+  --ga-mono:      'JetBrains Mono', 'Fira Code', monospace;
+  --ga-shadow:    0 1px 2px 0 rgba(45, 78, 86, 0.04), 0 4px 12px 0 rgba(45, 78, 86, 0.02);
 
   /* transect-viewer local aliases */
-  --bg:        var(--ga-void);      /* Flipped to a soft light slate layout base */
-  --panel:     var(--ga-stratum);   /* Clean, bright white surface for tool controls */
-  --panel2:    var(--ga-layer);     /* Slightly tinted cool slate for inner layout grouping */
-  --border:    var(--ga-border);    /* Crisp structural grid borders */
-  --accent:    var(--ga-accent);    /* Core brand teal for main controls and tools */
-  --accent2:   var(--ga-blue);      /* Mineral blue for secondary data markers */
-  --text:      var(--ga-text);      /* High-contrast dark charcoal text */
-  --muted:     var(--ga-subdued);   /* Tailored secondary text label color */
-  --danger:    var(--ga-red);       /* Earthy clay-red for fault lines or severe anomalies */
-  --success:   var(--ga-green);     /* Organic sage green for stable stratigraphic layers */
-  --canvas-bg: var(--ga-paper);     /* Pure white vector canvas so your data plots leap forward */
+  --bg:        var(--ga-void);
+  --panel:     var(--ga-stratum);
+  --panel2:    var(--ga-void);
+  --border:    var(--ga-border);
+  --accent:    var(--ga-accent);
+  --accent2:   var(--ga-blue);
+  --text:      var(--ga-text);
+  --muted:     var(--ga-subdued);
+  --danger:    var(--ga-red);
+  --success:   var(--ga-green);
+  --canvas-bg: var(--ga-paper);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: var(--ga-serif);
+  font-family: var(--ga-sans);
   background: var(--ga-depth);
   color: var(--text);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -70,25 +86,27 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 28px;
-  border-bottom: 2px solid var(--ga-accent);
-  background: var(--ga-void);
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--ga-border);
+  background: var(--ga-layer);
   flex-shrink: 0;
 }
+.app-header .header-brand { display: flex; align-items: center; gap: 12px; }
+.app-header .soil-logo { height: 34px; width: auto; opacity: .75; flex-shrink: 0; }
 .app-header h1 {
-  font-family: var(--ga-serif);
+  font-family: var(--ga-sans);
   font-size: .9rem;
   font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--ga-accent);
+  letter-spacing: .04em;
+  color: var(--ga-ink);
 }
-.app-header h1 span { color: var(--muted); font-weight: 400; }
+.app-header h1 span { color: var(--muted); font-weight: 400; letter-spacing: normal; }
+.app-header h1 small { font-weight: 400; opacity: .45; font-size: .75em; color: var(--ga-subdued); margin-left: .5em; letter-spacing: .08em; text-transform: uppercase; }
 .header-badge {
   font-family: var(--ga-mono);
-  font-size: .68rem;
+  font-size: .66rem;
   color: var(--muted);
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 
@@ -104,35 +122,42 @@ body {
 .sidebar {
   width: 320px;
   flex-shrink: 0;
-  background: var(--panel);
+  background: transparent;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding: 0 0 24px;
+  padding: 16px 16px 24px;
 }
 
 .sidebar-section {
-  padding: 18px 20px 14px;
-  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  padding: 18px 20px;
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 16px;
+  transition: box-shadow .2s;
 }
-.sidebar-section:last-child { border-bottom: none; }
+.sidebar-section:hover { box-shadow: var(--shadow-card-hover); }
+.sidebar-section:last-child { margin-bottom: 0; }
 
 .sec-label {
   font-family: var(--ga-mono);
-  font-size: .63rem;
-  letter-spacing: .15em;
+  font-size: .62rem;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 12px;
+  font-weight: 600;
+  margin-bottom: 14px;
 }
 
 /* ── Borehole list ── */
-.borehole-list { display: flex; flex-direction: column; gap: 6px; }
+.borehole-list { display: flex; flex-direction: column; gap: 8px; }
 .borehole-item {
   background: var(--panel2);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   padding: 10px 12px;
   display: flex;
   align-items: center;
@@ -160,7 +185,7 @@ body {
   height: 28px;
   width: 28px;
   flex-shrink: 0;
-  border-radius: 2px;
+  border-radius: 6px;
   overflow: hidden;
   flex-direction: column;
   border: 1px solid var(--border);
@@ -188,43 +213,45 @@ body {
 
 /* ── File drop zone ── */
 .drop-zone {
-  border: 1.5px dashed var(--border);
-  border-radius: 4px;
-  padding: 16px 12px;
+  border: 1.5px dashed var(--ga-border);
+  border-radius: var(--radius-md);
+  padding: 18px 12px;
   text-align: center;
   cursor: pointer;
   transition: all .2s;
   position: relative;
+  background: var(--ga-void);
 }
 .drop-zone:hover, .drop-zone.drag-over {
   border-color: var(--accent);
-  background: rgba(200,169,110,.05);
+  background: var(--ga-accent-bg);
 }
 .drop-zone input[type="file"] {
   position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
 }
-.drop-zone-icon { font-size: 1.4rem; margin-bottom: 6px; }
+.drop-zone-icon { font-size: 1.4rem; margin-bottom: 6px; color: var(--accent); }
 .drop-zone-text { font-size: .72rem; color: var(--muted); line-height: 1.5; }
 .drop-zone-text strong { color: var(--accent); }
 
 /* ── Controls ── */
-.control-group { margin-bottom: 14px; }
+.control-group { margin-bottom: 16px; }
 .control-group:last-child { margin-bottom: 0; }
 .ctrl-label {
-  font-size: .68rem;
+  font-size: .66rem;
   color: var(--muted);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   display: block;
   font-family: var(--ga-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
+  font-weight: 600;
 }
 .ctrl-row { display: flex; gap: 6px; }
 
 .btn-seg {
   flex: 1;
-  padding: 7px 4px;
-  border: 1px solid var(--border);
+  padding: 8px 4px;
+  border: 1px solid var(--ga-border);
   background: var(--panel2);
   color: var(--muted);
   font-family: var(--ga-mono);
@@ -232,12 +259,12 @@ body {
   font-weight: 600;
   letter-spacing: .06em;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: var(--radius-pill);
   transition: all .15s;
   text-transform: uppercase;
 }
 .btn-seg:hover { border-color: var(--accent); color: var(--accent); }
-.btn-seg.active { background: var(--accent); border-color: var(--accent); color: #1a1c1e; }
+.btn-seg.active { background: var(--accent); border-color: var(--accent); color: var(--ga-void); }
 
 .range-row {
   display: flex;
@@ -259,53 +286,54 @@ body {
   color: var(--accent);
   min-width: 36px;
   text-align: right;
+  font-weight: 600;
 }
 
 select.ctrl-select {
   width: 100%;
-  padding: 7px 10px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
+  padding: 9px 10px;
+  background: var(--ga-layer);
+  border: 1px solid var(--ga-border);
   color: var(--text);
   font-family: var(--ga-mono);
   font-size: .72rem;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
-select.ctrl-select:focus { outline: none; border-color: var(--accent); }
+select.ctrl-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ga-accent-bg); }
 
 .checkbox-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 9px;
+  margin-bottom: 8px;
 }
 .checkbox-row input[type="checkbox"] {
   accent-color: var(--accent);
-  width: 13px; height: 13px;
+  width: 14px; height: 14px;
   cursor: pointer;
   flex-shrink: 0;
 }
 .checkbox-row label {
-  font-size: .72rem;
-  color: var(--muted);
+  font-size: .74rem;
+  color: var(--text);
   cursor: pointer;
 }
 
 /* ── Export buttons ── */
-.export-row { display: flex; gap: 6px; }
+.export-row { display: flex; gap: 8px; }
 .btn-export {
   flex: 1;
-  padding: 8px 6px;
-  border: 1px solid var(--border);
+  padding: 10px 6px;
+  border: 1px solid var(--ga-border);
   background: var(--panel2);
   color: var(--muted);
   font-family: var(--ga-mono);
   font-size: .65rem;
-  font-weight: 600;
-  letter-spacing: .1em;
+  font-weight: 700;
+  letter-spacing: .08em;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
   transition: all .15s;
 }
@@ -313,9 +341,9 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 .btn-export.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #1a1c1e;
+  color: var(--ga-void);
 }
-.btn-export.primary:hover { opacity: .85; }
+.btn-export.primary:hover { background: var(--ga-accent-lt); border-color: var(--ga-accent-lt); }
 
 /* ── Canvas area ── */
 .canvas-area {
@@ -323,14 +351,14 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #FFFFFF;
+  background: var(--ga-void);
 }
 
 .canvas-toolbar {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--panel);
   flex-shrink: 0;
@@ -343,32 +371,48 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 }
 .canvas-info strong { color: var(--accent); }
 
+/* Canvas (left, flexible) + legend (right, fixed-width sidebar) side by side */
+.canvas-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .canvas-scroll {
   flex: 1;
-  overflow: auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  overflow: hidden;   /* panning/zooming is handled ourselves, not by native scrollbars */
+  position: relative;
+  cursor: grab;
+}
+.canvas-scroll.panning { cursor: grabbing; }
+
+.canvas-viewport {
+  transform-origin: 0 0;
+  will-change: transform;
+  display: inline-block;
   padding: 24px;
 }
 
 #transectCanvas {
   background: var(--canvas-bg);
   display: block;
-  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card-hover);
 }
 
-/* ── Legend panel ── */
+/* ── Legend panel — right-hand sidebar next to the canvas ── */
 .legend-panel {
-  background: var(--panel);
-  border-top: 1px solid var(--border);
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  width: 320px;
   flex-shrink: 0;
-  min-height: 42px;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
 }
 .legend-title {
   font-family: var(--ga-mono);
@@ -376,6 +420,7 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   text-transform: uppercase;
   letter-spacing: .12em;
   color: var(--muted);
+  font-weight: 600;
   flex-shrink: 0;
 }
 .legend-items { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
@@ -389,10 +434,82 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 }
 .legend-swatch {
   width: 14px; height: 14px;
-  border-radius: 1px;
-  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 4px;
+  border: 1px solid var(--ga-border);
   flex-shrink: 0;
 }
+
+/* ── Editable legend list (sidebar) ── */
+.legend-edit-list { display: flex; flex-direction: column; gap: 6px; }
+.legend-edit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--panel2);
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+}
+.legend-edit-swatch {
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--ga-border);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.legend-edit-body { flex: 1; min-width: 0; }
+.legend-edit-code {
+  font-family: var(--ga-mono);
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.legend-edit-note {
+  width: 100%;
+  resize: vertical;
+  min-height: 30px;
+  font-family: var(--ga-sans);
+  font-size: .68rem;
+  line-height: 1.35;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--ga-border);
+  border-radius: 6px;
+  padding: 5px 7px;
+  box-sizing: border-box;
+}
+.legend-edit-note:focus { outline: none; border-color: var(--accent); }
+.legend-edit-label-input {
+  width: 100%;
+  font-family: var(--ga-mono);
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--ga-border);
+  border-radius: 6px;
+  padding: 4px 7px;
+  box-sizing: border-box;
+  margin-bottom: 3px;
+}
+.legend-edit-label-input:focus { outline: none; border-color: var(--accent); }
+.legend-edit-empty {
+  font-size: .68rem;
+  color: var(--muted);
+  font-style: italic;
+  padding: 4px 2px;
+}
+.legend-edit-subhead {
+  font-family: var(--ga-mono);
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+.legend-edit-subhead:first-child { margin-top: 0; }
 
 /* ── No-data overlay ── */
 .no-data-overlay {
@@ -411,10 +528,11 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   color: var(--muted);
   letter-spacing: .1em;
   text-transform: uppercase;
+  font-weight: 600;
 }
 .no-data-overlay .nd-sub {
   font-size: .75rem;
-  color: #3a4048;
+  color: var(--ga-subdued);
   text-align: center;
   max-width: 260px;
   line-height: 1.6;
@@ -429,9 +547,46 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   line-height: 1.55;
   margin-bottom: 10px;
 }
+.corr-anchor-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.corr-anchor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel2);
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 9px;
+}
+.corr-anchor-name {
+  font-family: var(--ga-mono);
+  font-size: .64rem;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+  min-width: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.corr-anchor-btns { display: flex; gap: 4px; flex: 1; }
+.corr-anchor-btn {
+  flex: 1;
+  padding: 4px 2px;
+  border: 1px solid var(--ga-border);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: var(--ga-mono);
+  font-size: .6rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all .12s;
+}
+.corr-anchor-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.corr-anchor-btn.active { background: var(--accent); border-color: var(--accent); color: var(--ga-void); }
 .btn-corr-toggle {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px 10px;
   border: 1.5px solid var(--accent);
   background: none;
   color: var(--accent);
@@ -440,44 +595,58 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all .15s;
   margin-bottom: 10px;
 }
 .btn-corr-toggle.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--ga-void);
 }
-.btn-corr-toggle:hover:not(.active) { background: rgba(45,78,86,.08); }
+.btn-corr-toggle:hover:not(.active) { background: var(--ga-accent-bg); }
 
 .corr-status {
   font-family: var(--ga-mono);
   font-size: .67rem;
   color: var(--muted);
   background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 6px 9px;
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
   margin-bottom: 8px;
   min-height: 28px;
   line-height: 1.5;
 }
 .corr-status .sel-highlight { color: var(--accent); font-weight: 700; }
 
-.corr-connections { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+.corr-connections { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .corr-conn-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
   background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 5px 8px;
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 9px;
   font-family: var(--ga-mono);
   font-size: .64rem;
   color: var(--muted);
 }
+.corr-conn-anchors { display: flex; flex-wrap: wrap; gap: 4px; }
+.corr-conn-anchor-pill {
+  padding: 3px 7px;
+  border: 1px solid var(--ga-border);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: var(--ga-mono);
+  font-size: .6rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all .12s;
+}
+.corr-conn-anchor-pill:hover { border-color: var(--accent2); color: var(--accent2); }
 .corr-conn-swatch {
   width: 8px; height: 8px;
   border-radius: 50%;
@@ -501,10 +670,10 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-  padding: 6px 9px;
+  padding: 8px 10px;
   background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-sm);
 }
 .corr-color-row label {
   font-family: var(--ga-mono);
@@ -515,9 +684,9 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   flex: 1;
 }
 .corr-color-preview {
-  width: 22px; height: 22px;
-  border-radius: 2px;
-  border: 1px solid var(--border);
+  width: 24px; height: 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--ga-border);
   cursor: pointer;
   position: relative;
   flex-shrink: 0;
@@ -540,7 +709,7 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
   position: relative;
   overflow: hidden;
   width: 14px; height: 14px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .corr-conn-item .corr-conn-swatch input[type="color"] {
   position: absolute;
@@ -557,7 +726,7 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 .layer-editor-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.45);
+  background: rgba(15,28,38,.45);
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -565,29 +734,29 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 }
 .layer-editor-modal {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-lg);
   padding: 0;
   width: 320px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 40px rgba(0,0,0,.35);
+  box-shadow: var(--shadow-modal);
 }
 .layer-editor-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px 10px;
+  padding: 16px 20px 14px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .layer-editor-title {
   font-family: var(--ga-mono);
-  font-size: .75rem;
+  font-size: .72rem;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: .06em;
+  letter-spacing: .1em;
   text-transform: uppercase;
 }
 .layer-editor-close {
@@ -598,27 +767,27 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 .layer-editor-list {
   overflow-y: auto;
   flex: 1;
-  padding: 8px 12px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 .layer-editor-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 8px;
+  padding: 7px 10px;
   background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  border: 1px solid var(--ga-border);
+  border-radius: var(--radius-sm);
   font-family: var(--ga-mono);
   font-size: .65rem;
   color: var(--muted);
 }
 .layer-editor-swatch {
   width: 20px; height: 20px;
-  border-radius: 2px;
-  border: 1px solid var(--border);
+  border-radius: 6px;
+  border: 1px solid var(--ga-border);
   flex-shrink: 0;
   cursor: pointer;
   position: relative;
@@ -638,10 +807,10 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 .layer-editor-depth { color: var(--accent); font-weight: 600; }
 .layer-editor-desc  { color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .layer-editor-footer {
-  padding: 10px 12px;
+  padding: 14px 16px;
   border-top: 1px solid var(--border);
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -649,27 +818,32 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 .bh-layers-strip { cursor: pointer; transition: box-shadow .15s; }
 .bh-layers-strip:hover { box-shadow: 0 0 0 2px var(--accent); }
 
+#tooltip {
   position: fixed;
   background: rgba(26,28,30,.95);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   padding: 8px 12px;
   font-family: var(--ga-mono);
   font-size: .68rem;
-  color: var(--text);
+  color: #fff;
   pointer-events: none;
   z-index: 9999;
   display: none;
   max-width: 220px;
   line-height: 1.6;
+  box-shadow: var(--shadow-modal);
 }
-#tooltip .tt-color { display: inline-block; width: 10px; height: 10px; border-radius: 1px; margin-right: 4px; vertical-align: middle; }
+#tooltip .tt-color { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
 </style>
 </head>
 <body>
 
 <div class="app-header">
-  <h1>Stratigraphic Transect Viewer <span>/ Core Logger Addon</span></h1>
+  <div class="header-brand">
+    <img class="soil-logo" id="logoImg" alt="Core Logger Logo" onerror="this.style.display='none'">
+    <h1>Stratigraphic Transect Viewer <span>/ Core Logger Addon</span><small>v0.2.0 · Pre-release</small></h1>
+  </div>
   <div class="header-badge">Import JSON or TXT profiles · Visualise transects · Export SVG / PNG / JPG</div>
 </div>
 
@@ -690,6 +864,17 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
           Multiple files supported
         </div>
       </div>
+    </div>
+
+    <!-- Project save/load -->
+    <div class="sidebar-section">
+      <div class="sec-label">Transect Project</div>
+      <p class="corr-hint">Save everything — profiles, correlations, legend notes and all display settings — as one JSON file, and reload it later to pick up exactly where you left off.</p>
+      <div class="export-row">
+        <button class="btn-export primary" onclick="saveProjectJSON()">↓ Save Project</button>
+        <button class="btn-export" onclick="document.getElementById('projectFileInput').click()">↑ Load Project</button>
+      </div>
+      <input type="file" id="projectFileInput" accept=".json" style="display:none;">
     </div>
 
     <!-- Loaded boreholes -->
@@ -725,6 +910,16 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
         <div class="ctrl-row" id="paperSizeRow">
           <button class="btn-seg active" data-size="A4">A4</button>
           <button class="btn-seg" data-size="A3">A3</button>
+          <button class="btn-seg" data-size="Custom">Custom</button>
+        </div>
+      </div>
+
+      <div class="control-group" id="customPaperGroup" style="display:none;">
+        <span class="ctrl-label">Custom Size (mm, landscape basis)</span>
+        <div class="ctrl-row" style="gap:8px;">
+          <input type="number" id="customPaperW" min="50" max="3000" step="1" value="297" style="width:100%;padding:8px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.72rem;">
+          <span style="align-self:center;color:var(--muted);font-size:.7rem;">×</span>
+          <input type="number" id="customPaperH" min="50" max="3000" step="1" value="210" style="width:100%;padding:8px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.72rem;">
         </div>
       </div>
 
@@ -737,6 +932,48 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
       </div>
 
       <div style="font-size:.62rem;color:var(--muted);font-family:var(--ga-mono);margin-top:2px;" id="paperDimsLabel">297 × 210 mm · 96 dpi</div>
+    </div>
+
+    <!-- Canvas appearance -->
+    <div class="sidebar-section">
+      <div class="sec-label">Canvas</div>
+
+      <div class="control-group">
+        <span class="ctrl-label">Background Colour</span>
+        <div class="corr-color-row" style="margin-bottom:0;">
+          <label for="canvasBgColorPicker">Colour</label>
+          <div class="corr-color-preview" id="canvasBgColorPreview" style="background:#ffffff;">
+            <input type="color" id="canvasBgColorPicker" value="#ffffff">
+          </div>
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="showPaperTexture" checked>
+        <label for="showPaperTexture">Decorative paper grid texture</label>
+      </div>
+
+      <div class="control-group">
+        <span class="ctrl-label">Margins (px)</span>
+        <div class="ctrl-row" style="gap:6px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:60px;">
+            <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);">Left</span>
+            <input type="number" id="padLeftInput" min="20" max="400" step="5" value="80" style="width:100%;padding:6px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.7rem;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:60px;">
+            <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);">Right</span>
+            <input type="number" id="padRightInput" min="20" max="400" step="5" value="190" style="width:100%;padding:6px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.7rem;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:60px;">
+            <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);">Top</span>
+            <input type="number" id="padTopInput" min="20" max="400" step="5" value="110" style="width:100%;padding:6px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.7rem;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:60px;">
+            <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);">Bottom</span>
+            <input type="number" id="padBottomInput" min="20" max="400" step="5" value="90" style="width:100%;padding:6px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.7rem;">
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Scale & spacing -->
@@ -772,9 +1009,26 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
       <div class="control-group">
         <span class="ctrl-label">3D Offset Depth</span>
         <div class="range-row">
-          <input type="range" id="depthRange" min="0" max="60" value="20" step="2">
-          <span class="range-val" id="depthVal">20px</span>
+          <input type="range" id="depthRange" min="0" max="60" value="0" step="2">
+          <span class="range-val" id="depthVal">0px</span>
         </div>
+        <div style="font-size:.62rem;color:var(--muted);font-family:var(--ga-mono);margin-top:4px;">Off by default — a flat 2D view. Drag right for a 3D-perspective effect.</div>
+      </div>
+
+      <div class="control-group">
+        <span class="ctrl-label">Depth Axis Tick Interval (m)</span>
+        <div class="ctrl-row" style="gap:8px;">
+          <input type="number" id="depthTickStep" min="0" step="0.05" value="0" style="width:100%;padding:8px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.72rem;">
+        </div>
+        <div style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);margin-top:3px;">0 = automatic</div>
+      </div>
+
+      <div class="control-group">
+        <span class="ctrl-label">Elevation Axis Tick Interval (m)</span>
+        <div class="ctrl-row" style="gap:8px;">
+          <input type="number" id="elevTickStep" min="0" step="0.05" value="0" style="width:100%;padding:8px;border:1px solid var(--ga-border);border-radius:6px;background:var(--panel2);color:var(--text);font-family:var(--ga-mono);font-size:.72rem;">
+        </div>
+        <div style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);margin-top:3px;">0 = automatic</div>
       </div>
     </div>
 
@@ -786,12 +1040,32 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
         <label for="showInterpol">Manual correlation lines</label>
       </div>
       <div class="checkbox-row">
-        <input type="checkbox" id="showMarkers" checked>
-        <label for="showMarkers">Markers &amp; horizon indicators</label>
+        <input type="checkbox" id="showMarkerTicks" checked>
+        <label for="showMarkerTicks">Marker ticks &amp; leader lines</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showMarkerText" checked>
+        <label for="showMarkerText">Marker text labels</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showObservationOverlay" checked>
+        <label for="showObservationOverlay">Observation/find texture overlay</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showUnits" checked>
+        <label for="showUnits">Stratigraphic units</label>
       </div>
       <div class="checkbox-row">
         <input type="checkbox" id="showCompaction" checked>
-        <label for="showCompaction">Compaction zones</label>
+        <label for="showCompaction">Disturbance zones</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showDisturbedHatch" checked>
+        <label for="showDisturbedHatch">Disturbed-layer hatch fill</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showTransitions" checked>
+        <label for="showTransitions">Transition boundary styles (dashed/wavy)</label>
       </div>
       <div class="checkbox-row">
         <input type="checkbox" id="showLabels" checked>
@@ -799,7 +1073,23 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
       </div>
       <div class="checkbox-row">
         <input type="checkbox" id="showTexture" checked>
-        <label for="showTexture">Lithology &amp; find textures</label>
+        <label for="showTexture">Lithology grain texture</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showGrainSizeColumn">
+        <label for="showGrainSizeColumn">Grain-size / weathering profile columns</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showBoreholeOutline" checked>
+        <label for="showBoreholeOutline">Borehole outline box</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showLayerDepths">
+        <label for="showLayerDepths">Per-layer depth labels (cm, beside each core)</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="showTotalDepth">
+        <label for="showTotalDepth">Total core depth</label>
       </div>
       <div class="checkbox-row">
         <input type="checkbox" id="showDepthAxis" checked>
@@ -815,12 +1105,46 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
       </div>
     </div>
 
+    <!-- Typography -->
+    <div class="sidebar-section">
+      <div class="sec-label">Typography</div>
+      <div class="control-group">
+        <span class="ctrl-label">Header Text (core ID, z=, EPSG)</span>
+        <div class="range-row">
+          <input type="range" id="fontScaleHeader" min="0.6" max="1.8" value="1" step="0.05">
+          <span class="range-val" id="fontScaleHeaderVal">×1.00</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <span class="ctrl-label">Axis Text (depth, elevation, distance)</span>
+        <div class="range-row">
+          <input type="range" id="fontScaleAxis" min="0.6" max="1.8" value="1" step="0.05">
+          <span class="range-val" id="fontScaleAxisVal">×1.00</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <span class="ctrl-label">Layer Classification Labels</span>
+        <div class="range-row">
+          <input type="range" id="fontScaleLabels" min="0.6" max="1.8" value="1" step="0.05">
+          <span class="range-val" id="fontScaleLabelsVal">×1.00</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <span class="ctrl-label">Annotations (depth ticks, markers, tags)</span>
+        <div class="range-row">
+          <input type="range" id="fontScaleAnnotate" min="0.6" max="1.8" value="1" step="0.05">
+          <span class="range-val" id="fontScaleAnnotateVal">×1.00</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Correlate layers -->
     <div class="sidebar-section">
       <div class="sec-label">Correlate Layers</div>
       <p class="corr-hint">Enable correlation mode, then click one layer in each core to connect them. Select 2–6 layers to form a band.</p>
       <button class="btn-corr-toggle" id="btnCorrMode">⊕ Enable Correlation Mode</button>
       <div class="corr-status" id="corrStatus">Correlation mode off.</div>
+      <div class="corr-anchor-list" id="corrAnchorList"></div>
       <div style="display:flex;gap:6px;margin-bottom:8px;">
         <button class="btn-export" id="btnCorrConfirm" style="display:none;flex:1;" onclick="confirmConnection()">✓ Connect</button>
         <button class="btn-export" id="btnCorrCancel"  style="display:none;flex:1;" onclick="cancelSelection()">✕ Cancel</button>
@@ -847,6 +1171,10 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
           <option value="600">600 dpi (poster)</option>
         </select>
       </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="exportTransparentBg">
+        <label for="exportTransparentBg">Transparent background (PNG &amp; SVG)</label>
+      </div>
       <div class="export-row">
         <button class="btn-export primary" onclick="exportAs('png')">PNG</button>
         <button class="btn-export" onclick="exportAs('jpg')">JPG</button>
@@ -862,22 +1190,70 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
       <span class="canvas-info" id="canvasInfo"><strong>0</strong> profiles loaded</span>
       <span class="canvas-info" id="canvasRange"></span>
       <span class="canvas-info" id="canvasDir"></span>
+      <span style="flex:1;"></span>
+      <span class="canvas-info" id="zoomInfo">100%</span>
+      <button class="btn-export" id="btnResetView" title="Reset pan/zoom to your paper format settings" style="padding:5px 10px;flex:0 0 auto;">⤾ Reset View</button>
     </div>
-    <div class="canvas-wrap">
-      <div class="canvas-scroll" id="canvasScroll">
-        <canvas id="transectCanvas" width="800" height="600"></canvas>
+    <div class="canvas-body">
+      <div class="canvas-wrap">
+        <div class="canvas-scroll" id="canvasScroll">
+          <div class="canvas-viewport" id="canvasViewport">
+            <canvas id="transectCanvas" width="800" height="600"></canvas>
+          </div>
+        </div>
+        <div class="no-data-overlay" id="noDataOverlay">
+          <div class="nd-title">No Data</div>
+          <div class="nd-sub">Import Core Logger JSON or TXT profiles using the sidebar to begin building your stratigraphic transect.</div>
+        </div>
       </div>
-      <div class="no-data-overlay" id="noDataOverlay">
-        <div class="nd-title">No Data</div>
-        <div class="nd-sub">Import Core Logger JSON or TXT profiles using the sidebar to begin building your stratigraphic transect.</div>
+      <div class="legend-panel" id="legendPanel">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <span class="legend-title">Legend</span>
+          <div class="checkbox-row" style="margin-bottom:0;">
+            <input type="checkbox" id="showLegendOnCanvas">
+            <label for="showLegendOnCanvas">Bake into canvas &amp; export</label>
+          </div>
+        </div>
+        <div id="legendContentRow" style="display:flex;align-items:center;gap:14px;margin:6px 0 2px;flex-wrap:wrap;">
+          <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);text-transform:uppercase;letter-spacing:.08em;">Include</span>
+          <div class="checkbox-row" style="margin-bottom:0;">
+            <input type="checkbox" id="legendIncludeFill" checked>
+            <label for="legendIncludeFill">Core descriptions</label>
+          </div>
+          <div class="checkbox-row" style="margin-bottom:0;">
+            <input type="checkbox" id="legendIncludeCorr" checked>
+            <label for="legendIncludeCorr">Correlation bands</label>
+          </div>
+        </div>
+        <div id="legendPosRow" style="display:none;align-items:center;gap:8px;margin:6px 0 2px;flex-wrap:wrap;">
+          <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);text-transform:uppercase;letter-spacing:.08em;">Position</span>
+          <div class="ctrl-row" id="legendPosModeRow" style="flex:0 0 auto;">
+            <button class="btn-seg active" data-mode="auto" style="padding:5px 10px;">Auto (below plot)</button>
+            <button class="btn-seg" data-mode="manual" style="padding:5px 10px;">Manual — drag on canvas</button>
+          </div>
+          <button class="corr-conn-del" id="legendPosReset" title="Reset to auto position" style="display:none;font-size:.95rem;">↺</button>
+        </div>
+        <div id="legendManualHint" style="display:none;font-size:.62rem;color:var(--muted);margin-bottom:4px;">Drag the legend directly on the canvas to reposition it — click a swatch or its text to edit it right there.</div>
+        <div id="legendSizeRow" style="display:none;align-items:center;gap:8px;margin:2px 0 6px;">
+          <span style="font-size:.6rem;color:var(--muted);font-family:var(--ga-mono);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;">Size</span>
+          <input type="range" id="legendScale" min="0.6" max="2" value="1" step="0.05" style="flex:1;">
+          <span class="range-val" id="legendScaleVal" style="min-width:44px;">×1.00</span>
+        </div>
+        <div class="legend-edit-list" id="legendItems"></div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:2px;">Tip: when baked into the canvas, click any legend row directly on the canvas to edit it there too.</div>
       </div>
-    </div>
-    <div class="legend-panel">
-      <span class="legend-title">Legend</span>
-      <div class="legend-items" id="legendItems"></div>
     </div>
   </div>
 
+</div>
+
+<!-- Floating inline editor for editing a legend row directly on the canvas -->
+<div id="canvasLegendEditor" style="display:none;position:fixed;z-index:500;background:#fff;border:1.5px solid var(--accent);border-radius:8px;box-shadow:var(--shadow-modal);padding:8px;min-width:220px;">
+  <input type="text" id="canvasLegendEditorLabel" placeholder="Label" style="display:none;width:100%;margin-bottom:6px;padding:6px 7px;border:1px solid var(--ga-border);border-radius:5px;font-family:var(--ga-mono);font-size:.7rem;box-sizing:border-box;">
+  <textarea id="canvasLegendEditorNote" placeholder="Description / note…" style="width:100%;min-height:56px;padding:6px 7px;border:1px solid var(--ga-border);border-radius:5px;font-family:var(--ga-sans);font-size:.72rem;box-sizing:border-box;resize:vertical;"></textarea>
+  <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
+    <button id="canvasLegendEditorDone" style="padding:5px 12px;border:none;border-radius:5px;background:var(--accent);color:#fff;font-family:var(--ga-mono);font-size:.66rem;font-weight:700;cursor:pointer;">Done</button>
+  </div>
 </div>
 
 <!-- Layer colour editor modal -->
@@ -898,23 +1274,83 @@ select.ctrl-select:focus { outline: none; border-color: var(--accent); }
 
 <script>
 // ═══════════════════════════════════════════════════════════
+//  LOGO — same relative path & loading approach as the Core Logger, so
+//  keeping the two files (and logo.png) in the same folder gives a
+//  matching header in both tools automatically.
+// ═══════════════════════════════════════════════════════════
+(function(){
+    const img = document.getElementById('logoImg');
+    if (img) img.src = './logo.png';
+})();
+
+// ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
 const boreholes  = [];
 let perspective  = 'N';
 let bhColW       = 60;
-let offset3D     = 20;
+let offset3D     = 0;
 let vScaleMult   = 1.0;   // multiplier on top of auto-fit vertical scale
 let hScaleMult   = 1.0;   // multiplier on top of auto-fit horizontal scale
 
 // Paper format state
-let paperSize    = 'A4';   // 'A4' | 'A3'
+let paperSize    = 'A4';   // 'A4' | 'A3' | 'Custom'
 let paperOrient  = 'landscape'; // 'landscape' | 'portrait'
+let customPaperWmm = 297;  // used when paperSize === 'Custom' (landscape-basis width)
+let customPaperHmm = 210;  // used when paperSize === 'Custom' (landscape-basis height)
+
+// Canvas customization state
+let canvasBgColor    = '#ffffff';
+let showPaperTexture = true;
+
+// Adjustable page margins (logical/96dpi px) — replace the old fixed constants
+let PAD_LEFT   = 80;
+let PAD_RIGHT  = 190;
+let PAD_TOP    = 110;
+let PAD_BOTTOM = 90;
+
+// Typography — independent scale multipliers per text category, so any
+// one kind of label can be made bigger/smaller without affecting the rest.
+let fontScaleHeader    = 1;  // core ID / z= / EPSG header block above each core
+let fontScaleAxis      = 1;  // depth / elevation / distance axis ticks & titles
+let fontScaleLabels    = 1;  // in-column lithology classification labels
+let fontScaleAnnotate  = 1;  // depth ticks, disturbance tags, marker text, unit brackets
+
+// Height-indicator (axis tick interval) overrides — 0 means "auto", same
+// step-size heuristic as before; a positive number fixes the interval.
+let depthTickStep = 0;
+let elevTickStep  = 0;
+let showTotalDepth = false;   // print each core's total logged depth
+
+// Markers & observations — split into independently toggleable pieces:
+// the tick/dot/leader-line, the text label itself, and the find/observation
+// texture ornament drawn inside the layer.
+let showMarkerTicks = true;
+let showMarkerText  = true;
+let showObservationOverlay = true;
+
+// Legend state
+let showLegendOnCanvas = false;   // bake the detailed legend into the canvas/export
+let legendNotes = {};             // { [lithologyCode]: freeTextNote }
+let legendIncludeFill = true;     // include the "core descriptions" section
+let legendIncludeCorr = true;     // include the "correlation bands" section
+let legendScale = 1;              // swatch/font/spacing scale for the legend
+let legendPosMode = 'auto';       // 'auto' (below the plot) | 'manual' (dragged on canvas)
+let legendPos = null;             // { x, y } in logical/paper px — set once the person drags it
+let legendDrag = null;            // { offsetX, offsetY } while a drag is in progress
+let lastLegendBBox = null;        // { x, y, w, h } of the legend as last drawn — used for hit-testing drags
+let lastLegendRows = [];          // per-row hit boxes (logical coords) — used for click-to-edit on the canvas
+let justDraggedLegend = false;    // true for one tick after a legend drag ends, to swallow the trailing click
 
 // Correlation state
 // pendingSelection: Map of bhUid → Set of layerIndices
 let corrMode         = false;
 let pendingSelection = new Map();      // Map<bhUid, Set<layerIdx>>
+let pendingAnchor    = new Map();      // Map<bhUid, 'full'|'top'|'bottom'> — which edge of the
+                                        // selected layer(s) this side connects at. 'top'/'bottom'
+                                        // collapse that side to a single point (a pinch-out wedge)
+                                        // instead of the full layer span, for "may not be
+                                        // documented here but could continue" correlations.
 const manualConnections = [];          // [{ sides:[{bhUid, layerIndices:[]},...], color }, ...]
 
 // Paper dimensions in mm (at 96 dpi: 1mm = 96/25.4 ≈ 3.7795 px)
@@ -924,7 +1360,9 @@ const PAPER_SIZES = {
   A3: { w: 420, h: 297 },
 };
 function getPaperPx() {
-  const s = PAPER_SIZES[paperSize];
+  const s = paperSize === 'Custom'
+    ? { w: customPaperWmm, h: customPaperHmm }
+    : PAPER_SIZES[paperSize];
   const wMM = paperOrient === 'landscape' ? s.w : s.h;
   const hMM = paperOrient === 'landscape' ? s.h : s.w;
   return { w: Math.round(wMM * MM_TO_PX), h: Math.round(hMM * MM_TO_PX) };
@@ -1144,76 +1582,76 @@ function detectLanguage(desc) {
 const SOIL_DATA = 
 {
     "colors": [
-    { "name": "White",                          "hex": "#d6d1c9", "munsell": "10YR 8/1"  },
-    { "name": "Pale Yellow",                    "hex": "#F1E4B8", "munsell": "2.5Y 8/4"  },
-    { "name": "Pale Yellow",                    "hex": "#FCD683", "munsell": "2.5Y 8/8"  },
-    { "name": "Brownish Yellow",                "hex": "#C1A365", "munsell": "10YR 6/6"  },
+    { "name": "White",                          "hex": "#D1C9BC", "munsell": "10YR 8/1"  },
+    { "name": "Pale Yellow",                    "hex": "#DFC896", "munsell": "2.5Y 8/4"  },
+    { "name": "Yellow",                    "hex": "#EFC562", "munsell": "2.5Y 8/8"  },
+    { "name": "Brownish Yellow",                "hex": "#B88D51", "munsell": "10YR 6/6"  },
 
-    { "name": "Light Yellowish Brown",          "hex": "#CCBC9A", "munsell": "10YR 7/3"  },
-    { "name": "Light Yellowish Brown",          "hex": "#D3C79F", "munsell": "10YR 7/4"  },
-    { "name": "Light Yellowish Brown",          "hex": "#c9bda5", "munsell": "10YR 7/3"  },
-    { "name": "Light Yellowish Brown",          "hex": "#a79273", "munsell": "10YR 6/4"  },
-    { "name": "Light Olive Brown",              "hex": "#8d7f57", "munsell": "2.5Y 5/4"  },
-    { "name": "Light Olive Brown",              "hex": "#958A6C", "munsell": "2.5Y 6/4"  },
-    { "name": "Light Reddish Brown",            "hex": "#BAA391", "munsell": "5YR 6/4"   },
-    { "name": "Light Brown",                    "hex": "#a18d75", "munsell": "7.5YR 6/4" },
-    { "name": "Yellowish Brown",                "hex": "#877353", "munsell": "10YR 5/4"  },
-    { "name": "Yellowish Brown",                "hex": "#958261", "munsell": "10YR 5/6"  },
-    { "name": "Grayish Yellowish Brown",        "hex": "#857f76", "munsell": "10YR 5/2"  },
-    { "name": "Brown",                          "hex": "#857766", "munsell": "7.5YR 5/4" },
-    { "name": "Moderate Brown",                 "hex": "#705c42", "munsell": "7.5YR 4/4" },
-    { "name": "Strong Brown",                   "hex": "#7a593e", "munsell": "7.5YR 5/6" },
-    { "name": "Moderate Reddish Brown",         "hex": "#A0887C", "munsell": "5YR 5/4"   },
-    { "name": "Moderate Reddish Brown",         "hex": "#7e5241", "munsell": "5YR 4/4"   },
-    { "name": "Dark Reddish Brown",             "hex": "#6e460b", "munsell": "5YR 3/4"   },
-    { "name": "Dark Yellowish Brown",           "hex": "#69563c", "munsell": "10YR 4/4"  },
-    { "name": "Dark Yellowish Brown",           "hex": "#68583F", "munsell": "10YR 4/6"  },
-    { "name": "Dark Brown",                     "hex": "#675949", "munsell": "7.5YR 4/2" },
-    { "name": "Dark Brown",                     "hex": "#4e4131", "munsell": "7.5YR 3/2" },
-    { "name": "Dark Brown",                     "hex": "#4d3f33", "munsell": "7.5YR 3/3" },
-    { "name": "Dark Brown",                     "hex": "#3b3022", "munsell": "7.5YR 2/2" },
-    { "name": "Dark Grayish Yellowish Brown",   "hex": "#736757", "munsell": "10YR 4/2"  },
-    { "name": "Dark Grayish Yellowish Brown",   "hex": "#645b50", "munsell": "10YR 4/1"  },
-    { "name": "Dark Reddish Brown",             "hex": "#503932", "munsell": "5YR 3/3"   },
-    { "name": "Dark Grayish Brown",             "hex": "#59554f", "munsell": "2.5Y 3/2"  },
-    { "name": "Brownish Black",                 "hex": "#24201b", "munsell": "7.5YR 2/1" },
-    { "name": "Very Dark Brown",                "hex": "#4A4339", "munsell": "10YR 3/2"  },
-    { "name": "Very Dark Brown",                "hex": "#2c2621", "munsell": "10YR 2/1"  },
-    { "name": "Very Dark Grayish Brown",        "hex": "#5E5649", "munsell": "10YR 3/1"  },
-    { "name": "Very Dark Grayish Brown",        "hex": "#4b443b", "munsell": "2.5Y 3/1"  },
+    { "name": "Very Pale Brown",          "hex": "#C4AC8C", "munsell": "10YR 7/3"  },
+    { "name": "Very Pale Brown",          "hex": "#C9AB81", "munsell": "10YR 7/4"  },
+    { "name": "Very Pale Brown",          "hex": "#C4AC8C", "munsell": "10YR 7/3"  },
+    { "name": "Light Yellowish Brown",          "hex": "#AE9068", "munsell": "10YR 6/4"  },
+    { "name": "Light Olive Brown",              "hex": "#8F774B", "munsell": "2.5Y 5/4"  },
+    { "name": "Light Yellowish Brown",              "hex": "#A99264", "munsell": "2.5Y 6/4"  },
+    { "name": "Reddish Yellow",            "hex": "#B48C72", "munsell": "5YR 6/4"   },
+    { "name": "Light Brown",                    "hex": "#B28E6E", "munsell": "7.5YR 6/4" },
+    { "name": "Yellowish Brown",                "hex": "#93754F", "munsell": "10YR 5/4"  },
+    { "name": "Yellowish Brown",                "hex": "#9C7337", "munsell": "10YR 5/6"  },
+    { "name": "Grayish Brown",        "hex": "#887865", "munsell": "10YR 5/2"  },
+    { "name": "Brown",                          "hex": "#977354", "munsell": "7.5YR 5/4" },
+    { "name": "Brown",                 "hex": "#7D593A", "munsell": "7.5YR 4/4" },
+    { "name": "Strong Brown",                   "hex": "#A2703F", "munsell": "7.5YR 5/6" },
+    { "name": "Yellowish Red",         "hex": "#997259", "munsell": "5YR 5/4"   },
+    { "name": "Reddish Brown",         "hex": "#7F583F", "munsell": "5YR 4/4"   },
+    { "name": "Dark Reddish Brown",             "hex": "#633F2A", "munsell": "5YR 3/4"   },
+    { "name": "Dark Yellowish Brown",           "hex": "#795B36", "munsell": "10YR 4/4"  },
+    { "name": "Dark Yellowish Brown",           "hex": "#805921", "munsell": "10YR 4/6"  },
+    { "name": "Brown",                     "hex": "#715D4E", "munsell": "7.5YR 4/2" },
+    { "name": "Dark Brown",                     "hex": "#564436", "munsell": "7.5YR 3/2" },
+    { "name": "Dark Brown",                     "hex": "#5B422E", "munsell": "7.5YR 3/3" },
+    { "name": "Dark Brown",                     "hex": "#3C2C22", "munsell": "7.5YR 2/2" },
+    { "name": "Dark Grayish Brown",   "hex": "#6E5E4B", "munsell": "10YR 4/2"  },
+    { "name": "Dark Gray",   "hex": "#685F55", "munsell": "10YR 4/1"  },
+    { "name": "Dark Reddish Brown",             "hex": "#5E4131", "munsell": "5YR 3/3"   },
+    { "name": "Very Dark Grayish Brown",             "hex": "#514634", "munsell": "2.5Y 3/2"  },
+    { "name": "Black",                 "hex": "#362E28", "munsell": "7.5YR 2/1" },
+    { "name": "Very Dark Grayish Brown",                "hex": "#544535", "munsell": "10YR 3/2"  },
+    { "name": "Black",                "hex": "#352E28", "munsell": "10YR 2/1"  },
+    { "name": "Very Dark Gray",        "hex": "#4E463D", "munsell": "10YR 3/1"  },
+    { "name": "Very Dark Gray",        "hex": "#4C473D", "munsell": "2.5Y 3/1"  },
 
-    { "name": "Light Brownish Gray",            "hex": "#bcb6ad", "munsell": "10YR 7/1"  },
-    { "name": "Light Brownish Gray",            "hex": "#C9BDA5", "munsell": "2.5Y 7/2"  },
-    { "name": "Light Brownish Gray",            "hex": "#AFA48E", "munsell": "10YR 6/2"  },
-    { "name": "Light Greenish Gray",            "hex": "#BFC1B3", "munsell": "5Y 7/1"    },
-    { "name": "Light Olive Gray",               "hex": "#AEAC93", "munsell": "5Y 6/2"    },
-    { "name": "Light Gray",                     "hex": "#C7C6BF", "munsell": "2.5Y 7/1"  },
-    { "name": "Medium Gray",                    "hex": "#828282", "munsell": "N 5/"       },
-    { "name": "Greenish Gray",                  "hex": "#A6A89B", "munsell": "5Y 6/1"    },
-    { "name": "Dark Greenish Gray",             "hex": "#7a8279", "munsell": "5GY 5/1"   },
-    { "name": "Light Bluish Green",             "hex": "#99C1C2", "munsell": "5BG 7/2"   },
-    { "name": "Moderate Greenish Blue",         "hex": "#778385", "munsell": "5B 5/2"    },
-    { "name": "Olive Gray",                     "hex": "#8b8773", "munsell": "5Y 5/2"    },
-    { "name": "Olive Gray",                     "hex": "#716E5B", "munsell": "5Y 4/2"    },
-    { "name": "Dark Brownish Gray",             "hex": "#706C63", "munsell": "10YR 4/1"  },
-    { "name": "Dark Gray",                      "hex": "#616363", "munsell": "N 4/"       },
-    { "name": "Dark Gray",                      "hex": "#48494B", "munsell": "N 3/"       },
-    { "name": "Dark Olive Gray",                "hex": "#605D4E", "munsell": "5Y 4/1"    },
-    { "name": "Dark Greenish Gray",             "hex": "#6E7168", "munsell": "5GY 4/1"   },
-    { "name": "Very Dark Grayish Brown",        "hex": "#59554C", "munsell": "2.5Y 3/1"  },
-    { "name": "Black",                          "hex": "#433f3c", "munsell": "N 2/"       },
+    { "name": "Light Gray",            "hex": "#B6AEA3", "munsell": "10YR 7/1"  },
+    { "name": "Light Gray",            "hex": "#BAAE95", "munsell": "2.5Y 7/2"  },
+    { "name": "Light Brownish Gray",            "hex": "#A3927E", "munsell": "10YR 6/2"  },
+    { "name": "Light Gray",            "hex": "#B4AFA0", "munsell": "5Y 7/1"    },
+    { "name": "Light Olive Gray",               "hex": "#9D957A", "munsell": "5Y 6/2"    },
+    { "name": "Light Gray",                     "hex": "#B4AFA1", "munsell": "2.5Y 7/1"  },
+    { "name": "Gray",                    "hex": "#797979", "munsell": "N 5/"       },
+    { "name": "Gray",                  "hex": "#999586", "munsell": "5Y 6/1"    },
+    { "name": "Greenish Gray",             "hex": "#797C71", "munsell": "5GY 5/1"   },
+    { "name": "Light Greenish Gray",             "hex": "#97B5B0", "munsell": "5BG 7/2"   },
+    { "name": "Bluish Gray",         "hex": "#687E84", "munsell": "5B 5/2"    },
+    { "name": "Olive Gray",                     "hex": "#827A62", "munsell": "5Y 5/2"    },
+    { "name": "Olive Gray",                     "hex": "#696049", "munsell": "5Y 4/2"    },
+    { "name": "Dark Gray",             "hex": "#685F55", "munsell": "10YR 4/1"  },
+    { "name": "Dark Gray",                      "hex": "#606060", "munsell": "N 4/"       },
+    { "name": "Dark Gray",                      "hex": "#484848", "munsell": "N 3/"       },
+    { "name": "Dark Gray",                "hex": "#646054", "munsell": "5Y 4/1"    },
+    { "name": "Dark Greenish Gray",             "hex": "#5F6259", "munsell": "5GY 4/1"   },
+    { "name": "Very Dark Gray",        "hex": "#4C473D", "munsell": "2.5Y 3/1"  },
+    { "name": "Black",                          "hex": "#313131", "munsell": "N 2/"       },
 
-    { "name": "Light Grayish Olive",            "hex": "#ABAC8D", "munsell": "5Y 6/3"    },
-    { "name": "Grayish Olive",                  "hex": "#8D8F79", "munsell": "5Y 5/3"    },
-    { "name": "Light Olive",                    "hex": "#8F8B66", "munsell": "5Y 5/4"    },
-    { "name": "Grayish Olive Green",            "hex": "#8B947F", "munsell": "5GY 5/2"   },
+    { "name": "Pale Olive",            "hex": "#A0946E", "munsell": "5Y 6/3"    },
+    { "name": "Olive",                  "hex": "#867A56", "munsell": "5Y 5/3"    },
+    { "name": "Olive",                    "hex": "#897A49", "munsell": "5Y 5/4"    },
+    { "name": "Greenish Gray",            "hex": "#767D66", "munsell": "5GY 5/2"   },
 
-    { "name": "Moderate Reddish Orange",        "hex": "#a15b35", "munsell": "5YR 4/6"   },
-    { "name": "Deep Reddish Brown",             "hex": "#662a22", "munsell": "2.5YR 3/6" },
+    { "name": "Reddish Brown",        "hex": "#89542F", "munsell": "5YR 4/6"   },
+    { "name": "Dark Red",             "hex": "#703720", "munsell": "2.5YR 3/6" },
 
-    { "name": "Greenish Black",                 "hex": "#484A3F", "munsell": "5GY 2/1"   },
-    { "name": "Black",                          "hex": "#211f1e", "munsell": "N 2/"       },
-    { "name": "Brownish Black",                 "hex": "#231f20", "munsell": "7.5YR 2/1" },
+    { "name": "Black",                 "hex": "#2F302C", "munsell": "5GY 2/1"   },
+    { "name": "Black",                          "hex": "#313131", "munsell": "N 2/"       },
+    { "name": "Black",                 "hex": "#362E28", "munsell": "7.5YR 2/1" },
 
     { "name": "No Colour",                      "hex": "#ffffff", "munsell": ""           },
 
@@ -1235,7 +1673,268 @@ const SOIL_DATA =
   { "name": "Very Dark Brown",             "hex": "#3D2F24", "munsell": "" },
   { "name": "Dark Grey",                   "hex": "#555A60", "munsell": "" },
   { "name": "Very Dark Grey / Near Black", "hex": "#2B2D2F", "munsell": "" }
+,
 
+  // ── Soil Color Chart additions (authoritative aqp sRGB) ──
+  { "name": "Reddish Black", "hex": "#382D2B", "munsell": "10R 2/1" },
+  { "name": "Dusky Red", "hex": "#3F2A28", "munsell": "10R 2/2" },
+  { "name": "Dusky Red", "hex": "#462724", "munsell": "10R 2/3" },
+  { "name": "Dusky Red", "hex": "#4B2420", "munsell": "10R 2/4" },
+  { "name": "Dusky Red", "hex": "#551D19", "munsell": "10R 2/6" },
+  { "name": "Dusky Red", "hex": "#5F1211", "munsell": "10R 2/8" },
+  { "name": "Dark Reddish Gray", "hex": "#514441", "munsell": "10R 3/1" },
+  { "name": "Dusky Red", "hex": "#5A413D", "munsell": "10R 3/2" },
+  { "name": "Dusky Red", "hex": "#613E38", "munsell": "10R 3/3" },
+  { "name": "Dusky Red", "hex": "#673B33", "munsell": "10R 3/4" },
+  { "name": "Dark Red", "hex": "#733529", "munsell": "10R 3/6" },
+  { "name": "Dark Red", "hex": "#7D2C1D", "munsell": "10R 3/8" },
+  { "name": "Dark Reddish Gray", "hex": "#6A5E5B", "munsell": "10R 4/1" },
+  { "name": "Weak Red", "hex": "#735B55", "munsell": "10R 4/2" },
+  { "name": "Weak Red", "hex": "#7B5850", "munsell": "10R 4/3" },
+  { "name": "Weak Red", "hex": "#83554A", "munsell": "10R 4/4" },
+  { "name": "Red", "hex": "#8F4F3E", "munsell": "10R 4/6" },
+  { "name": "Red", "hex": "#9A4832", "munsell": "10R 4/8" },
+  { "name": "Reddish Gray", "hex": "#827876", "munsell": "10R 5/1" },
+  { "name": "Weak Red", "hex": "#8C7570", "munsell": "10R 5/2" },
+  { "name": "Red", "hex": "#957369", "munsell": "10R 5/3" },
+  { "name": "Red", "hex": "#9C7063", "munsell": "10R 5/4" },
+  { "name": "Red", "hex": "#AB6A56", "munsell": "10R 5/6" },
+  { "name": "Red", "hex": "#B86348", "munsell": "10R 5/8" },
+  { "name": "Pinkish Gray", "hex": "#9D9290", "munsell": "10R 6/1" },
+  { "name": "Pale Red", "hex": "#A79089", "munsell": "10R 6/2" },
+  { "name": "Light Red", "hex": "#B08D83", "munsell": "10R 6/3" },
+  { "name": "Light Red", "hex": "#B88A7C", "munsell": "10R 6/4" },
+  { "name": "Light Red", "hex": "#C68570", "munsell": "10R 6/6" },
+  { "name": "Light Red", "hex": "#D37F63", "munsell": "10R 6/8" },
+  { "name": "Pinkish White", "hex": "#B7ADAB", "munsell": "10R 7/1" },
+  { "name": "Pinkish Gray", "hex": "#C1AAA4", "munsell": "10R 7/2" },
+  { "name": "Pink", "hex": "#CAA89D", "munsell": "10R 7/3" },
+  { "name": "Pink", "hex": "#D2A597", "munsell": "10R 7/4" },
+  { "name": "Pink", "hex": "#E29F89", "munsell": "10R 7/6" },
+  { "name": "Pink", "hex": "#F1997B", "munsell": "10R 7/8" },
+  { "name": "Pinkish White", "hex": "#CDC9C8", "munsell": "10R 8/1" },
+  { "name": "Pinkish Gray", "hex": "#D9C6C0", "munsell": "10R 8/2" },
+  { "name": "Pink", "hex": "#E5C3B8", "munsell": "10R 8/3" },
+  { "name": "Pink", "hex": "#EFC0B0", "munsell": "10R 8/4" },
+  { "name": "Pink", "hex": "#FFBAA1", "munsell": "10R 8/6" },
+  { "name": "Pink", "hex": "#FFB392", "munsell": "10R 8/8" },
+  { "name": "Reddish Black", "hex": "#372D2A", "munsell": "2.5YR 2/1" },
+  { "name": "Dusky Red", "hex": "#3F2B26", "munsell": "2.5YR 2/2" },
+  { "name": "Dusky Red", "hex": "#452821", "munsell": "2.5YR 2/3" },
+  { "name": "Dusky Red", "hex": "#4A251C", "munsell": "2.5YR 2/4" },
+  { "name": "Dusky Red", "hex": "#531F11", "munsell": "2.5YR 2/6" },
+  { "name": "Dusky Red", "hex": "#5D1600", "munsell": "2.5YR 2/8" },
+  { "name": "Dark Reddish Gray", "hex": "#514440", "munsell": "2.5YR 3/1" },
+  { "name": "Dusky Red", "hex": "#59423A", "munsell": "2.5YR 3/2" },
+  { "name": "Dusky Red", "hex": "#603F34", "munsell": "2.5YR 3/3" },
+  { "name": "Dusky Red", "hex": "#663D2E", "munsell": "2.5YR 3/4" },
+  { "name": "Dark Red", "hex": "#79310E", "munsell": "2.5YR 3/8" },
+  { "name": "Dark Reddish Gray", "hex": "#6A5E59", "munsell": "2.5YR 4/1" },
+  { "name": "Weak Red", "hex": "#735B53", "munsell": "2.5YR 4/2" },
+  { "name": "Weak Red", "hex": "#7B594C", "munsell": "2.5YR 4/3" },
+  { "name": "Weak Red", "hex": "#815645", "munsell": "2.5YR 4/4" },
+  { "name": "Red", "hex": "#8C5137", "munsell": "2.5YR 4/6" },
+  { "name": "Red", "hex": "#964C26", "munsell": "2.5YR 4/8" },
+  { "name": "Reddish Gray", "hex": "#837873", "munsell": "2.5YR 5/1" },
+  { "name": "Weak Red", "hex": "#8C766D", "munsell": "2.5YR 5/2" },
+  { "name": "Red", "hex": "#947366", "munsell": "2.5YR 5/3" },
+  { "name": "Red", "hex": "#9B715E", "munsell": "2.5YR 5/4" },
+  { "name": "Red", "hex": "#A96B4F", "munsell": "2.5YR 5/6" },
+  { "name": "Red", "hex": "#B4663D", "munsell": "2.5YR 5/8" },
+  { "name": "Pinkish Gray", "hex": "#9E928D", "munsell": "2.5YR 6/1" },
+  { "name": "Pale Red", "hex": "#A79086", "munsell": "2.5YR 6/2" },
+  { "name": "Light Red", "hex": "#AF8E7F", "munsell": "2.5YR 6/3" },
+  { "name": "Light Red", "hex": "#B68B77", "munsell": "2.5YR 6/4" },
+  { "name": "Light Red", "hex": "#C58668", "munsell": "2.5YR 6/6" },
+  { "name": "Light Red", "hex": "#D18158", "munsell": "2.5YR 6/8" },
+  { "name": "Pinkish White", "hex": "#B8ADA9", "munsell": "2.5YR 7/1" },
+  { "name": "Pinkish Gray", "hex": "#C1ABA1", "munsell": "2.5YR 7/2" },
+  { "name": "Pink", "hex": "#CAA899", "munsell": "2.5YR 7/3" },
+  { "name": "Pink", "hex": "#D2A691", "munsell": "2.5YR 7/4" },
+  { "name": "Pink", "hex": "#E1A180", "munsell": "2.5YR 7/6" },
+  { "name": "Pink", "hex": "#EE9B70", "munsell": "2.5YR 7/8" },
+  { "name": "Pinkish White", "hex": "#CEC9C6", "munsell": "2.5YR 8/1" },
+  { "name": "Pinkish Gray", "hex": "#DAC6BD", "munsell": "2.5YR 8/2" },
+  { "name": "Pink", "hex": "#E5C3B3", "munsell": "2.5YR 8/3" },
+  { "name": "Pink", "hex": "#EEC0AA", "munsell": "2.5YR 8/4" },
+  { "name": "Pink", "hex": "#FEBB99", "munsell": "2.5YR 8/6" },
+  { "name": "Pink", "hex": "#FFB687", "munsell": "2.5YR 8/8" },
+  { "name": "Black", "hex": "#372E2A", "munsell": "5YR 2/1" },
+  { "name": "Dark Reddish Brown", "hex": "#3E2B24", "munsell": "5YR 2/2" },
+  { "name": "Dark Reddish Brown", "hex": "#43291D", "munsell": "5YR 2/3" },
+  { "name": "Dark Reddish Brown", "hex": "#482716", "munsell": "5YR 2/4" },
+  { "name": "Dark Reddish Brown", "hex": "#502203", "munsell": "5YR 2/6" },
+  { "name": "Dark Reddish Brown", "hex": "#581C00", "munsell": "5YR 2/8" },
+  { "name": "Dark Reddish Gray", "hex": "#51453F", "munsell": "5YR 3/1" },
+  { "name": "Dark Reddish Brown", "hex": "#584338", "munsell": "5YR 3/2" },
+  { "name": "Dark Reddish Brown", "hex": "#6C3A18", "munsell": "5YR 3/6" },
+  { "name": "Dark Reddish Brown", "hex": "#733600", "munsell": "5YR 3/8" },
+  { "name": "Dark Reddish Gray", "hex": "#695E58", "munsell": "5YR 4/1" },
+  { "name": "Reddish Brown", "hex": "#725C50", "munsell": "5YR 4/2" },
+  { "name": "Reddish Brown", "hex": "#795A48", "munsell": "5YR 4/3" },
+  { "name": "Yellowish Red", "hex": "#91501B", "munsell": "5YR 4/8" },
+  { "name": "Reddish Gray", "hex": "#837872", "munsell": "5YR 5/1" },
+  { "name": "Reddish Brown", "hex": "#8B766A", "munsell": "5YR 5/2" },
+  { "name": "Yellowish Red", "hex": "#937462", "munsell": "5YR 5/3" },
+  { "name": "Yellowish Red", "hex": "#A56E46", "munsell": "5YR 5/6" },
+  { "name": "Yellowish Red", "hex": "#AF6932", "munsell": "5YR 5/8" },
+  { "name": "Pinkish Gray", "hex": "#9E938B", "munsell": "5YR 6/1" },
+  { "name": "Light Reddish Brown", "hex": "#A69083", "munsell": "5YR 6/2" },
+  { "name": "Light Reddish Brown", "hex": "#AE8F7B", "munsell": "5YR 6/3" },
+  { "name": "Reddish Yellow", "hex": "#C1885F", "munsell": "5YR 6/6" },
+  { "name": "Reddish Yellow", "hex": "#CC844B", "munsell": "5YR 6/8" },
+  { "name": "Pinkish White", "hex": "#B8ADA6", "munsell": "5YR 7/1" },
+  { "name": "Pinkish Gray", "hex": "#C1AB9D", "munsell": "5YR 7/2" },
+  { "name": "Pink", "hex": "#C8A995", "munsell": "5YR 7/3" },
+  { "name": "Pink", "hex": "#D0A78B", "munsell": "5YR 7/4" },
+  { "name": "Reddish Yellow", "hex": "#DDA378", "munsell": "5YR 7/6" },
+  { "name": "Reddish Yellow", "hex": "#E99F65", "munsell": "5YR 7/8" },
+  { "name": "Pinkish White", "hex": "#D1C9C2", "munsell": "5YR 8/1" },
+  { "name": "Pinkish Gray", "hex": "#DBC6B8", "munsell": "5YR 8/2" },
+  { "name": "Pink", "hex": "#E4C4AE", "munsell": "5YR 8/3" },
+  { "name": "Pink", "hex": "#ECC2A4", "munsell": "5YR 8/4" },
+  { "name": "Reddish Yellow", "hex": "#FABE91", "munsell": "5YR 8/6" },
+  { "name": "Reddish Yellow", "hex": "#FFB97B", "munsell": "5YR 8/8" },
+  { "name": "Dark Brown", "hex": "#412B1A", "munsell": "7.5YR 2/3" },
+  { "name": "Dark Brown", "hex": "#452911", "munsell": "7.5YR 2/4" },
+  { "name": "Dark Brown", "hex": "#4C2600", "munsell": "7.5YR 2/6" },
+  { "name": "Dark Brown", "hex": "#522300", "munsell": "7.5YR 2/8" },
+  { "name": "Very Dark Gray", "hex": "#50453E", "munsell": "7.5YR 3/1" },
+  { "name": "Dark Brown", "hex": "#604026", "munsell": "7.5YR 3/4" },
+  { "name": "Dark Brown", "hex": "#683D11", "munsell": "7.5YR 3/6" },
+  { "name": "Dark Brown", "hex": "#6D3B00", "munsell": "7.5YR 3/8" },
+  { "name": "Dark Gray", "hex": "#695F57", "munsell": "7.5YR 4/1" },
+  { "name": "Brown", "hex": "#775B44", "munsell": "7.5YR 4/3" },
+  { "name": "Strong Brown", "hex": "#855628", "munsell": "7.5YR 4/6" },
+  { "name": "Strong Brown", "hex": "#8B530F", "munsell": "7.5YR 4/8" },
+  { "name": "Gray", "hex": "#827971", "munsell": "7.5YR 5/1" },
+  { "name": "Brown", "hex": "#8A7768", "munsell": "7.5YR 5/2" },
+  { "name": "Brown", "hex": "#91755E", "munsell": "7.5YR 5/3" },
+  { "name": "Strong Brown", "hex": "#AA6D27", "munsell": "7.5YR 5/8" },
+  { "name": "Gray", "hex": "#9D938A", "munsell": "7.5YR 6/1" },
+  { "name": "Pinkish Gray", "hex": "#A59181", "munsell": "7.5YR 6/2" },
+  { "name": "Light Brown", "hex": "#AC8F77", "munsell": "7.5YR 6/3" },
+  { "name": "Reddish Yellow", "hex": "#BD8A58", "munsell": "7.5YR 6/6" },
+  { "name": "Reddish Yellow", "hex": "#C78742", "munsell": "7.5YR 6/8" },
+  { "name": "Light Gray", "hex": "#B8AEA4", "munsell": "7.5YR 7/1" },
+  { "name": "Pinkish Gray", "hex": "#C0AC9B", "munsell": "7.5YR 7/2" },
+  { "name": "Pink", "hex": "#C7AA91", "munsell": "7.5YR 7/3" },
+  { "name": "Pink", "hex": "#CDA886", "munsell": "7.5YR 7/4" },
+  { "name": "Reddish Yellow", "hex": "#D9A571", "munsell": "7.5YR 7/6" },
+  { "name": "Reddish Yellow", "hex": "#E3A25B", "munsell": "7.5YR 7/8" },
+  { "name": "Light Gray", "hex": "#D2C9BF", "munsell": "7.5YR 8/1" },
+  { "name": "Pinkish Gray", "hex": "#DAC7B5", "munsell": "7.5YR 8/2" },
+  { "name": "Pink", "hex": "#E2C5AA", "munsell": "7.5YR 8/3" },
+  { "name": "Pink", "hex": "#E8C49F", "munsell": "7.5YR 8/4" },
+  { "name": "Reddish Yellow", "hex": "#F5C08A", "munsell": "7.5YR 8/6" },
+  { "name": "Reddish Yellow", "hex": "#FFBD72", "munsell": "7.5YR 8/8" },
+  { "name": "Very Dark Brown", "hex": "#3A2D20", "munsell": "10YR 2/2" },
+  { "name": "Very Dark Brown", "hex": "#3F2C17", "munsell": "10YR 2/3" },
+  { "name": "Very Dark Brown", "hex": "#422B0C", "munsell": "10YR 2/4" },
+  { "name": "Very Dark Brown", "hex": "#482800", "munsell": "10YR 2/6" },
+  { "name": "Very Dark Brown", "hex": "#4C2600", "munsell": "10YR 2/8" },
+  { "name": "Dark Yellowish Brown", "hex": "#58432C", "munsell": "10YR 3/3" },
+  { "name": "Dark Yellowish Brown", "hex": "#5C4222", "munsell": "10YR 3/4" },
+  { "name": "Dark Yellowish Brown", "hex": "#634008", "munsell": "10YR 3/6" },
+  { "name": "Dark Yellowish Brown", "hex": "#673E00", "munsell": "10YR 3/8" },
+  { "name": "Dark Yellowish Brown", "hex": "#745C41", "munsell": "10YR 4/3" },
+  { "name": "Dark Yellowish Brown", "hex": "#855700", "munsell": "10YR 4/8" },
+  { "name": "Gray", "hex": "#81796F", "munsell": "10YR 5/1" },
+  { "name": "Yellowish Brown", "hex": "#8E775A", "munsell": "10YR 5/3" },
+  { "name": "Yellowish Brown", "hex": "#A3711C", "munsell": "10YR 5/8" },
+  { "name": "Gray", "hex": "#9C9388", "munsell": "10YR 6/1" },
+  { "name": "Light Yellowish Brown", "hex": "#A99173", "munsell": "10YR 6/3" },
+  { "name": "Brownish Yellow", "hex": "#BF8B37", "munsell": "10YR 6/8" },
+  { "name": "Light Gray", "hex": "#BDAD97", "munsell": "10YR 7/2" },
+  { "name": "Yellow", "hex": "#D3A869", "munsell": "10YR 7/6" },
+  { "name": "Yellow", "hex": "#DBA651", "munsell": "10YR 7/8" },
+  { "name": "White", "hex": "#D8C8B1", "munsell": "10YR 8/2" },
+  { "name": "Very Pale Brown", "hex": "#DEC7A6", "munsell": "10YR 8/3" },
+  { "name": "Very Pale Brown", "hex": "#E4C69A", "munsell": "10YR 8/4" },
+  { "name": "Very Pale Brown", "hex": "#EFC382", "munsell": "10YR 8/6" },
+  { "name": "Very Pale Brown", "hex": "#F8C169", "munsell": "10YR 8/8" },
+  { "name": "Black", "hex": "#332F28", "munsell": "2.5Y 2/1" },
+  { "name": "Black", "hex": "#382E1F", "munsell": "2.5Y 2/2" },
+  { "name": "Black", "hex": "#3C2D15", "munsell": "2.5Y 2/3" },
+  { "name": "Black", "hex": "#3F2C07", "munsell": "2.5Y 2/4" },
+  { "name": "Black", "hex": "#442B00", "munsell": "2.5Y 2/6" },
+  { "name": "Black", "hex": "#482900", "munsell": "2.5Y 2/8" },
+  { "name": "Very Dark Grayish Brown", "hex": "#55452A", "munsell": "2.5Y 3/3" },
+  { "name": "Very Dark Grayish Brown", "hex": "#58441F", "munsell": "2.5Y 3/4" },
+  { "name": "Very Dark Grayish Brown", "hex": "#5D4301", "munsell": "2.5Y 3/6" },
+  { "name": "Very Dark Grayish Brown", "hex": "#614200", "munsell": "2.5Y 3/8" },
+  { "name": "Dark Gray", "hex": "#666054", "munsell": "2.5Y 4/1" },
+  { "name": "Dark Grayish Brown", "hex": "#6C5F4A", "munsell": "2.5Y 4/2" },
+  { "name": "Dark Grayish Brown", "hex": "#705E3E", "munsell": "2.5Y 4/3" },
+  { "name": "Dark Grayish Brown", "hex": "#745D33", "munsell": "2.5Y 4/4" },
+  { "name": "Dark Grayish Brown", "hex": "#795C1B", "munsell": "2.5Y 4/6" },
+  { "name": "Dark Grayish Brown", "hex": "#7E5B00", "munsell": "2.5Y 4/8" },
+  { "name": "Gray", "hex": "#807A6E", "munsell": "2.5Y 5/1" },
+  { "name": "Grayish Brown", "hex": "#867963", "munsell": "2.5Y 5/2" },
+  { "name": "Light Olive Brown", "hex": "#8A7858", "munsell": "2.5Y 5/3" },
+  { "name": "Light Olive Brown", "hex": "#967631", "munsell": "2.5Y 5/6" },
+  { "name": "Light Olive Brown", "hex": "#9B750F", "munsell": "2.5Y 5/8" },
+  { "name": "Gray", "hex": "#9A9487", "munsell": "2.5Y 6/1" },
+  { "name": "Light Brownish Gray", "hex": "#A0937C", "munsell": "2.5Y 6/2" },
+  { "name": "Light Yellowish Brown", "hex": "#A59370", "munsell": "2.5Y 6/3" },
+  { "name": "Yellow", "hex": "#B1904A", "munsell": "2.5Y 6/6" },
+  { "name": "Yellow", "hex": "#B78F2D", "munsell": "2.5Y 6/8" },
+  { "name": "Pale Yellow", "hex": "#C0AD89", "munsell": "2.5Y 7/3" },
+  { "name": "Pale Yellow", "hex": "#C5AD7D", "munsell": "2.5Y 7/4" },
+  { "name": "Pale Yellow", "hex": "#CDAB64", "munsell": "2.5Y 7/6" },
+  { "name": "Pale Yellow", "hex": "#D3AA49", "munsell": "2.5Y 7/8" },
+  { "name": "White", "hex": "#D0CABA", "munsell": "2.5Y 8/1" },
+  { "name": "White", "hex": "#D5C9AE", "munsell": "2.5Y 8/2" },
+  { "name": "Pale Yellow", "hex": "#DAC8A2", "munsell": "2.5Y 8/3" },
+  { "name": "Yellow", "hex": "#E8C67C", "munsell": "2.5Y 8/6" },
+  { "name": "Black", "hex": "#322F28", "munsell": "5Y 2/1" },
+  { "name": "Black", "hex": "#362F1E", "munsell": "5Y 2/2" },
+  { "name": "Black", "hex": "#392E13", "munsell": "5Y 2/3" },
+  { "name": "Black", "hex": "#3B2E04", "munsell": "5Y 2/4" },
+  { "name": "Black", "hex": "#3F2D00", "munsell": "5Y 2/6" },
+  { "name": "Very Dark Gray", "hex": "#4B473D", "munsell": "5Y 3/1" },
+  { "name": "Olive Gray", "hex": "#4E4733", "munsell": "5Y 3/2" },
+  { "name": "Olive Gray", "hex": "#514629", "munsell": "5Y 3/3" },
+  { "name": "Olive Gray", "hex": "#54461D", "munsell": "5Y 3/4" },
+  { "name": "Olive Gray", "hex": "#584500", "munsell": "5Y 3/6" },
+  { "name": "Olive Gray", "hex": "#5B4500", "munsell": "5Y 3/8" },
+  { "name": "Olive Gray", "hex": "#6C603D", "munsell": "5Y 4/3" },
+  { "name": "Olive Gray", "hex": "#6F5F31", "munsell": "5Y 4/4" },
+  { "name": "Olive Gray", "hex": "#735F15", "munsell": "5Y 4/6" },
+  { "name": "Olive Gray", "hex": "#775E00", "munsell": "5Y 4/8" },
+  { "name": "Gray", "hex": "#7E7A6E", "munsell": "5Y 5/1" },
+  { "name": "Olive", "hex": "#8F792C", "munsell": "5Y 5/6" },
+  { "name": "Olive", "hex": "#937802", "munsell": "5Y 5/8" },
+  { "name": "Olive Yellow", "hex": "#A39461", "munsell": "5Y 6/4" },
+  { "name": "Olive Yellow", "hex": "#AA9345", "munsell": "5Y 6/6" },
+  { "name": "Olive Yellow", "hex": "#AE9324", "munsell": "5Y 6/8" },
+  { "name": "Light Gray", "hex": "#B8AF94", "munsell": "5Y 7/2" },
+  { "name": "Pale Yellow", "hex": "#BBAF87", "munsell": "5Y 7/3" },
+  { "name": "Pale Yellow", "hex": "#BEAF7A", "munsell": "5Y 7/4" },
+  { "name": "Pale Yellow", "hex": "#C4AE5F", "munsell": "5Y 7/6" },
+  { "name": "Pale Yellow", "hex": "#C9AE42", "munsell": "5Y 7/8" },
+  { "name": "White", "hex": "#CFCAB9", "munsell": "5Y 8/1" },
+  { "name": "Pale Yellow", "hex": "#D2CAAC", "munsell": "5Y 8/2" },
+  { "name": "Pale Yellow", "hex": "#D6CAA0", "munsell": "5Y 8/3" },
+  { "name": "Pale Yellow", "hex": "#D9CA93", "munsell": "5Y 8/4" },
+  { "name": "Yellow", "hex": "#DFCA77", "munsell": "5Y 8/6" },
+  { "name": "Yellow", "hex": "#E4C95A", "munsell": "5Y 8/8" },
+  { "name": "Gray", "hex": "#7C7B6F", "munsell": "10Y 5/1" },
+  { "name": "Light Gray", "hex": "#969586", "munsell": "10Y 6/1" },
+  { "name": "Light Greenish Gray", "hex": "#939688", "munsell": "5GY 6/1" },
+  { "name": "Greenish Gray", "hex": "#757D74", "munsell": "10GY 5/1" },
+  { "name": "Light Greenish Gray", "hex": "#8D978D", "munsell": "10GY 6/1" },
+  { "name": "Greenish Gray", "hex": "#727D77", "munsell": "5G 5/1" },
+  { "name": "Light Greenish Gray", "hex": "#8B9890", "munsell": "5G 6/1" },
+  { "name": "Greenish Gray", "hex": "#717D79", "munsell": "10G 5/1" },
+  { "name": "Greenish Gray", "hex": "#707D7B", "munsell": "5BG 5/1" },
+  { "name": "Light Greenish Gray", "hex": "#8A9895", "munsell": "5BG 6/1" },
+  { "name": "Greenish Gray", "hex": "#6F7D7E", "munsell": "10BG 5/1" },
+  { "name": "Light Bluish Gray", "hex": "#8C9799", "munsell": "5B 6/1" },
+  { "name": "Black", "hex": "#3C3C3C", "munsell": "N 2.5/" },
+  { "name": "Gray", "hex": "#939393", "munsell": "N 6/" },
+  { "name": "Light Gray", "hex": "#ADADAD", "munsell": "N 7/" },
+  { "name": "White", "hex": "#C8C8C8", "munsell": "N 8/" }
 ],
      
     "soilMains": {
@@ -1357,12 +2056,12 @@ const PETRO_PRIMARY = [
     { code: 'Mu', en: 'mud',           de: 'Mudde' },
     { code: 'Hn', en: 'fen peat',      de: 'Niedermoortorf' },
     { code: 'Hh', en: 'bog peat',      de: 'Hochmoortorf' },
-    { code: 'Fs', en: 'fine sand',     de: 'Feinsand' },
-    { code: 'Ms', en: 'medium sand',   de: 'Mittelsand' },
-    { code: 'Gs', en: 'coarse sand',   de: 'Grobsand' },
-    { code: 'Fk', en: 'fine gravel',   de: 'Feinkies' },
-    { code: 'Mk', en: 'medium gravel', de: 'Mittelkies' },
-    { code: 'Gk', en: 'coarse gravel', de: 'Grobkies' },
+    { code: 'fS', en: 'fine sand',     de: 'Feinsand' },
+    { code: 'mS', en: 'medium sand',   de: 'Mittelsand' },
+    { code: 'gS', en: 'coarse sand',   de: 'Grobsand' },
+    { code: 'fG', en: 'fine gravel',   de: 'Feinkies' },
+    { code: 'mG', en: 'medium gravel', de: 'Mittelkies' },
+    { code: 'gG', en: 'coarse gravel', de: 'Grobkies' },
     { code: 'O',  en: 'organic matter',de: 'Organik' }
 ];
 const PETRO_SECONDARY = [
@@ -1482,64 +2181,150 @@ function gradeBaseCode(l) {
 
 const CORE_W_REF = 110;
 
+// Width fractions — kept in sync with the Core Logger's own table
+// (corelogger_index_v0_4_3.html). Every grain-size code the primary-soil
+// picker offers gets an explicit entry, including every sub-grade
+// (fT/mT/gT, vfU..vcU, vfS..vcS, vfG..vcG) — a bare-codes-only table would
+// leave every sub-grade falling through to the generic default.
 const SOIL_WIDTH_FRAC = {
-    // fines → narrow
-    'T':  0.42,   // clay
-    'U':  0.55,   // silt
-    'L':  0.62,   // loam
-    'Mu': 0.50,   // mud
-    // organics (kept mid-narrow, distinct from minerals)
-    'H':  0.58,   // peat
-    'Hn': 0.58,   // fen peat
-    'Hh': 0.58,   // bog peat
-    'O':  0.55,   // organic matter
+    // fines → narrow, graduated by sub-grade
+    'fT': 0.38, 'T': 0.42, 'mT': 0.44, 'gT': 0.48,
+    'vfU': 0.50, 'fU': 0.53, 'U': 0.55, 'mU': 0.57, 'gU': 0.60, 'vcU': 0.62,
+    'L': 0.62,
     // sands → medium, by sub-grade
-    'S':  0.74,   // sand (unspecified)
-    'Fs': 0.66,   // fine sand
-    'Ms': 0.78,   // medium sand
-    'Gs': 0.88,   // coarse sand
+    'vfS': 0.62, 'fS': 0.66, 'S': 0.74, 'mS': 0.78, 'gS': 0.88, 'vcS': 0.90,
     // gravels → wide, by sub-grade
-    'G':  0.92,   // gravel (unspecified)
-    'Fk': 0.86,   // fine gravel
-    'Mk': 0.94,   // medium gravel
-    'Gk': 1.00,   // coarse gravel
+    'vfG': 0.84, 'fG': 0.86, 'G': 0.92, 'mG': 0.94, 'gG': 1.00, 'vcG': 1.00,
     // stones → widest
-    'X':  1.00    // stones
+    'X': 1.00,
+    // organic — peat, mud & gyttja
+    'H': 0.58, 'Hn': 0.58, 'Hh': 0.58, 'Mu': 0.50,
+    'Mg': 0.52, 'Mgc': 0.52, 'Mgt': 0.48, 'Mgd': 0.54, 'Sap': 0.50, 'O': 0.55,
+    // pedogenic soil types — not a grain size, neutral loam-width default
+    'Br': 0.62, 'Pz': 0.62, 'Lv': 0.62, 'Gy': 0.62, 'Sg': 0.62, 'Rz': 0.62, 'Tz': 0.62,
 };
 
+// Resolve a layer's main soil code. A multi-soil ("banded") layer's
+// officialDesc is a "/"-joined string like "mS(h)/gS" — each part gets
+// its own modifiers stripped and the bare codes rejoined with "/", so
+// width-averaging and grain-texture rendering both see every soil, not
+// just the first.
 function layerMainCode(layer) {
-    const official = translateSoil(layer.originalDesc || '');   // e.g. "Fs(u,h)" or "-"
+    const official = translateSoil(layer.originalDesc || '');   // e.g. "fS(u,h)" or "-"
+    let raw = null;
     if (official && official !== '-') {
-        const m = official.match(/^[A-Za-z]+/);   // "Fs(u)" → "Fs"
-        if (m) return m[0];
+        const m = official.match(/^[A-Za-z]+/);
+        if (m) raw = m[0];
     }
-    return null;
+    // Prefer the layer's own stored officialDesc when it's multi-soil —
+    // translateSoil() only ever resolves a single main soil and can't
+    // reconstruct a "/"-joined code from free text.
+    const source = (typeof layer.officialDesc === 'string' && layer.officialDesc.includes('/'))
+        ? layer.officialDesc : raw;
+    if (!source) return null;
+    if (source.includes('/')) {
+        const bare = source.split('/').map(p => p.replace(/\(.*$/, '').trim()).filter(Boolean).join('/');
+        return bare || null;
+    }
+    return source;
 }
 
+// Width fraction for a code — a single soil code, or a multi-soil layer's
+// "/"-joined codes, in which case the width is the average of each part's
+// own fraction (matching the Core Logger's own averaging behaviour).
 function widthFracForCode(code) {
-    let frac = (code && SOIL_WIDTH_FRAC[code] != null) ? SOIL_WIDTH_FRAC[code] : null;
-    if (frac == null) frac = 0.74;   // sensible default (sand-like) when unknown
-    return frac;
+    if (!code) return 0.62;
+    const parts = code.split('/').map(c => c.trim()).filter(Boolean);
+    if (parts.length > 1) {
+        const fracs = parts.map(c => (SOIL_WIDTH_FRAC[c] != null) ? SOIL_WIDTH_FRAC[c] : 0.62);
+        return fracs.reduce((a, b) => a + b, 0) / fracs.length;
+    }
+    return (SOIL_WIDTH_FRAC[code] != null) ? SOIL_WIDTH_FRAC[code] : 0.62;
 }
 
+// ── Grain-size / weathering profile column geometry ──
+// Mirrors the Core Logger's own "grainsize" column style: each layer's body
+// is a trapezoid, left edge fixed at the borehole's spine, right edge width
+// = bhColW × the soil's grain-size width fraction (fines → narrow, gravel/
+// stones → full width). A gradational layer (gradeTo set) slopes from its
+// top soil's width to its base soil's width. "missing" layers always draw
+// at full width, matching the Core Logger.
+function layerTopBotWidths(l) {
+    if (!l || l.layerType === 'missing') return { wTop: bhColW, wBot: bhColW };
+    const topCode = (typeof layerMainCode === 'function') ? layerMainCode(l) : null;
+    const botCode = l.gradeTo || topCode;
+    return {
+        wTop: Math.round(bhColW * widthFracForCode(topCode)),
+        wBot: Math.round(bhColW * widthFracForCode(botCode)),
+    };
+}
+function layerBodyPath(ctx, x, y1, h, wTop, wBot) {
+    ctx.beginPath();
+    ctx.moveTo(x, y1);
+    ctx.lineTo(x + wTop, y1);
+    ctx.lineTo(x + wBot, y1 + h);
+    ctx.lineTo(x, y1 + h);
+    ctx.closePath();
+}
+
+// Right-edge width (px, relative to the borehole's spine) at an arbitrary
+// depth within a borehole — interpolated within whichever layer contains
+// that depth, matching that layer's own top/bottom taper. Used so manual
+// correlation bands can attach to the actual drawn (tapered) edge of a
+// core in grain-size profile mode instead of always assuming the full
+// column width. Falls back to the full column width outside grain-size
+// mode, or if the depth falls outside every layer.
+function edgeWidthAtDepth(bh, depth, useTaper) {
+    if (!useTaper || !bh || !Array.isArray(bh.layers)) return bhColW;
+    const eps = 1e-6;
+    for (const l of bh.layers) {
+        if (depth >= l.depthFrom - eps && depth <= l.depthTo + eps) {
+            const { wTop, wBot } = layerTopBotWidths(l);
+            const span = (l.depthTo - l.depthFrom) || 1;
+            const f = Math.max(0, Math.min(1, (depth - l.depthFrom) / span));
+            return wTop + (wBot - wTop) * f;
+        }
+    }
+    return bhColW;
+}
+
+// Maps a KA5 main code to a texture "family". Pattern-matched (not a fixed
+// list of exact codes) so every grain-size sub-grade resolves correctly —
+// fT/mT/gT, vfU..vcU, vfS..vcS, vfG..vcG all get a texture, not just the
+// bare T/U/S/G codes.
 function grainFamily(code) {
     if (!code) return null;
     if (code === 'X') return 'gravel';
-    if (/^G/.test(code) || code === 'Fk' || code === 'Mk' || code === 'Gk') return 'gravel';
-    if (/^F?s$/i.test(code) || code === 'S' || code === 'Fs' || code === 'Ms' || code === 'Gs') return 'sand';
-    if (code === 'U') return 'silt';
-    if (code === 'T') return 'clay';
+    if (/^(vf|vc|f|m|g)?G$/.test(code)) return 'gravel';
+    if (/^(vf|vc|f|m|g)?S$/.test(code)) return 'sand';
+    if (/^(vf|vc|f|m|g)?U$/.test(code)) return 'silt';
+    if (/^(vf|vc|f|m|g)?T$/.test(code)) return 'clay';
     if (code === 'L') return 'loam';      // loam = mixed → light stipple
     if (code === 'Mu') return 'mud';
     if (/^H/.test(code) || code === 'O') return 'organic';
     return null;
 }
 
-function drawGrainTexture(ctx, code, x, y, w, h, alpha) {
+// Grain-size sub-grade → element size/density multiplier, matching the
+// Core Logger — fine sand reads as smaller, denser grains than coarse
+// sand instead of every sub-grade of a family looking identical.
+function grainGradeMult(code) {
+    if (!code) return { size: 1, density: 1 };
+    if (/^vf/.test(code)) return { size: 0.55, density: 1.7 };
+    if (/^vc/.test(code)) return { size: 1.8,  density: 0.5 };
+    if (/^f/.test(code))  return { size: 0.75, density: 1.35 };
+    if (/^g/.test(code))  return { size: 1.45, density: 0.65 };
+    return { size: 1, density: 1 };
+}
+
+function drawGrainTexture(ctx, code, x, y, w, h, alpha, densityMult) {
     const fam = grainFamily(code);
     if (!fam || w <= 0 || h <= 0) return;
     const a = alpha == null ? 1 : Math.max(0, Math.min(1, alpha));
     if (a <= 0.02) return;
+    const dm = (densityMult == null || densityMult < 0) ? 1 : densityMult;
+    if (dm <= 0.02) return;
+    const grade = grainGradeMult(code);
 
     let seed = Math.floor(x*13 + y*7 + w*5 + h*3 + fam.length*17);
     const rand = () => { seed = (seed*16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -1549,14 +2334,14 @@ function drawGrainTexture(ctx, code, x, y, w, h, alpha) {
 
     if (fam === 'sand' || fam === 'loam') {
         const base = fam === 'sand' ? 90 : 55;
-        const n = Math.max(6, Math.floor((w*h) / base));
+        const n = Math.max(6, Math.floor((w*h) / base * dm * grade.density));
         ctx.fillStyle = `rgba(60,45,25,${0.32 * a})`;
         for (let i = 0; i < n; i++) {
-            const dx = x + rand()*w, dy = y + rand()*h, r = 0.6 + rand()*1.0;
+            const dx = x + rand()*w, dy = y + rand()*h, r = (0.6 + rand()*1.0) * grade.size;
             ctx.beginPath(); ctx.arc(dx, dy, r, 0, Math.PI*2); ctx.fill();
         }
     } else if (fam === 'silt') {
-        const n = Math.max(10, Math.floor((w*h) / 32));
+        const n = Math.max(10, Math.floor((w*h) / 32 * dm));
         ctx.fillStyle = `rgba(70,60,40,${0.20 * a})`;
         for (let i = 0; i < n; i++) {
             const dx = x + rand()*w, dy = y + rand()*h;
@@ -1566,7 +2351,7 @@ function drawGrainTexture(ctx, code, x, y, w, h, alpha) {
         // horizontal dashes in offset rows — the standard clay ornament
         ctx.strokeStyle = `rgba(40,40,55,${0.30 * a})`;
         ctx.lineWidth = 1;
-        const rowH = 7;
+        const rowH = Math.max(2.5, 7 / dm);
         let row = 0;
         for (let cy = y + 4; cy < y + h; cy += rowH, row++) {
             const dashLen = 9, gap = 9;
@@ -1577,10 +2362,10 @@ function drawGrainTexture(ctx, code, x, y, w, h, alpha) {
             }
         }
     } else if (fam === 'gravel') {
-        const n = Math.max(3, Math.floor((w*h) / 240));
+        const n = Math.max(3, Math.floor((w*h) / 240 * dm * grade.density));
         for (let i = 0; i < n; i++) {
             const dx = x + 3 + rand()*(w-6), dy = y + 3 + rand()*(h-6);
-            const rx = 2.2 + rand()*3.2, ry = rx * (0.65 + rand()*0.3), rot = rand()*Math.PI;
+            const rx = (2.2 + rand()*3.2) * grade.size, ry = rx * (0.65 + rand()*0.3), rot = rand()*Math.PI;
             ctx.save(); ctx.translate(dx, dy); ctx.rotate(rot);
             ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2);
             ctx.strokeStyle = `rgba(55,50,45,${0.45 * a})`; ctx.lineWidth = 0.9; ctx.stroke();
@@ -1837,6 +2622,7 @@ function getTransectCoord(bh) {
     case 'S': return -bh.x;   // looking S: left→right is E→W = decreasing X
     case 'W': return -bh.y;   // looking W: left→right is N→S = decreasing Y
     case 'E': return  bh.y;   // looking E: left→right is S→N = increasing Y
+    default:  return  bh.x;   // fallback: treat as 'N' so distances stay finite
   }
 }
 
@@ -1846,6 +2632,14 @@ function getTransectCoord(bh) {
 function parseJSON(text, filename) {
   const p = JSON.parse(text);
   if (!p.layers || !Array.isArray(p.layers)) throw new Error('Missing layers array');
+  // Soft version check: this parser was built against the Core Logger's
+  // JSON schema v2. A higher version means a newer export than this viewer
+  // knows about — still attempt to render (unknown fields are just
+  // ignored below), but warn once so a real schema change doesn't fail
+  // silently.
+  if (typeof p._version === 'number' && p._version > 2) {
+    console.warn(`${filename}: exported with a newer Core Logger schema (v${p._version}) than this viewer supports (v2) — some data may not display.`);
+  }
   const coords = p.coordinates || {};
   const x = parseFloat(coords.x) || 0;
   const y = parseFloat(coords.y) || 0;
@@ -1878,9 +2672,22 @@ function parseJSON(text, filename) {
         layerType:    l.layerType || 'normal',
         gradeTo,
         gradeSecondaries,
+        // KA5 soil horizon (Ah, Go, Cv…) auto-classified or user-edited in
+        // the Core Logger — shown alongside the lithology code when the
+        // "Markers & horizon indicators" overlay is on.
+        horizon:      l.horizon || null,
+        horizonConf:  l.horizonConf || null,
       };
     }),
-    compactions: p.compactions || [],
+    compactions: Array.isArray(p.compactions) ? p.compactions : [],
+    // Boundary character (sharp / gradual / wavy / irregular) between
+    // layers — drawn as the layer-separator line style instead of a plain
+    // straight line when present.
+    transitions: Array.isArray(p.transitions) ? p.transitions : [],
+    // Stratigraphic units (e.g. "beach zone", "upper till") group several
+    // layers into a broader named zone — shown as a bracket alongside the
+    // borehole column.
+    units: Array.isArray(p.units) ? p.units : [],
     filename
   };
 }
@@ -2014,15 +2821,214 @@ async function handleFiles(files) {
 }
 
 // ═══════════════════════════════════════════════════════════
+//  PROJECT SAVE / LOAD
+//  A full snapshot of the working session — every loaded profile plus
+//  every correlation, legend note and display setting — as one portable
+//  JSON file, distinct from the Core Logger's own per-core exports. This
+//  is what "continue working on this transect later" round-trips through.
+// ═══════════════════════════════════════════════════════════
+const PROJECT_FILE_TYPE = 'stratigraphic-transect-project';
+const PROJECT_FILE_VERSION = 1;
+
+// Every checkbox whose only job is a live on/off overlay toggle (read
+// fresh from the DOM each draw(), not mirrored into a JS variable) —
+// these just need their .checked state saved and restored verbatim.
+const PROJECT_CHECKBOX_IDS = [
+  'showInterpol', 'showMarkerTicks', 'showMarkerText', 'showObservationOverlay',
+  'showUnits', 'showCompaction', 'showLabels',
+  'showTexture', 'showGrainSizeColumn', 'showBoreholeOutline', 'showLayerDepths',
+  'showTotalDepth', 'showDisturbedHatch', 'showTransitions', 'showDepthAxis', 'showGrid', 'showElevAlign'
+];
+
+function buildProjectSnapshot() {
+  const checks = {};
+  PROJECT_CHECKBOX_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) checks[id] = el.checked;
+  });
+  return {
+    _projectType: PROJECT_FILE_TYPE,
+    _projectVersion: PROJECT_FILE_VERSION,
+    savedAt: new Date().toISOString(),
+    boreholes,
+    manualConnections,
+    legendNotes,
+    settings: {
+      perspective, bhColW, offset3D, vScaleMult, hScaleMult,
+      paperSize, paperOrient, customPaperWmm, customPaperHmm,
+      canvasBgColor, showPaperTexture,
+      PAD_LEFT, PAD_RIGHT, PAD_TOP, PAD_BOTTOM,
+      showLegendOnCanvas, legendIncludeFill, legendIncludeCorr, legendScale, legendPosMode, legendPos,
+      depthTickStep, elevTickStep,
+      fontScaleHeader, fontScaleAxis, fontScaleLabels, fontScaleAnnotate,
+      checks,
+      exportDPI: document.getElementById('exportDPI')?.value,
+      exportTransparentBg: document.getElementById('exportTransparentBg')?.checked,
+    }
+  };
+}
+
+function saveProjectJSON() {
+  if (!boreholes.length) { alert('No profiles loaded yet — nothing to save.'); return; }
+  const snapshot = buildProjectSnapshot();
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  triggerDL(
+    new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json;charset=utf-8' }),
+    `transect-project-${stamp}.json`
+  );
+}
+
+// Pushes every saved JS state variable back into place, then syncs every
+// DOM control that mirrors one (sliders, paper/orientation buttons, colour
+// pickers, margin inputs…) so the sidebar reflects the restored state
+// exactly — none of this is inferred from draw(), so it has to be done
+// explicitly here.
+function syncControlsFromState() {
+  document.querySelectorAll('#paperSizeRow .btn-seg').forEach(b => b.classList.toggle('active', b.dataset.size === paperSize));
+  document.getElementById('customPaperGroup').style.display = paperSize === 'Custom' ? 'block' : 'none';
+  document.getElementById('customPaperW').value = customPaperWmm;
+  document.getElementById('customPaperH').value = customPaperHmm;
+  document.querySelectorAll('#paperOrientRow .btn-seg').forEach(b => b.classList.toggle('active', b.dataset.orient === paperOrient));
+
+  document.getElementById('canvasBgColorPicker').value = canvasBgColor;
+  document.getElementById('canvasBgColorPreview').style.background = canvasBgColor;
+  document.getElementById('showPaperTexture').checked = showPaperTexture;
+
+  document.getElementById('padLeftInput').value = PAD_LEFT;
+  document.getElementById('padRightInput').value = PAD_RIGHT;
+  document.getElementById('padTopInput').value = PAD_TOP;
+  document.getElementById('padBottomInput').value = PAD_BOTTOM;
+
+  document.getElementById('vScaleMult').value = vScaleMult;
+  document.getElementById('vScaleMultVal').textContent = '×' + vScaleMult.toFixed(2);
+  document.getElementById('hScaleMult').value = hScaleMult;
+  document.getElementById('hScaleMultVal').textContent = '×' + hScaleMult.toFixed(2);
+  document.getElementById('widthRange').value = bhColW;
+  document.getElementById('widthVal').textContent = bhColW + 'px';
+  document.getElementById('depthRange').value = offset3D;
+  document.getElementById('depthVal').textContent = offset3D + 'px';
+
+  document.querySelectorAll('#perspectiveRow .btn-seg').forEach(b => b.classList.toggle('active', b.dataset.dir === perspective));
+
+  document.getElementById('showLegendOnCanvas').checked = showLegendOnCanvas;
+  document.getElementById('legendIncludeFill').checked = legendIncludeFill;
+  document.getElementById('legendIncludeCorr').checked = legendIncludeCorr;
+  document.getElementById('legendPosRow').style.display = showLegendOnCanvas ? 'flex' : 'none';
+  document.getElementById('legendSizeRow').style.display = showLegendOnCanvas ? 'flex' : 'none';
+  document.querySelectorAll('#legendPosModeRow .btn-seg').forEach(b => b.classList.toggle('active', b.dataset.mode === legendPosMode));
+  document.getElementById('legendManualHint').style.display = (showLegendOnCanvas && legendPosMode === 'manual') ? 'block' : 'none';
+  document.getElementById('legendPosReset').style.display = legendPosMode === 'manual' ? 'inline-block' : 'none';
+  document.getElementById('legendScale').value = legendScale;
+  document.getElementById('legendScaleVal').textContent = '×' + legendScale.toFixed(2);
+
+  document.getElementById('depthTickStep').value = depthTickStep || 0;
+  document.getElementById('elevTickStep').value = elevTickStep || 0;
+
+  ['fontScaleHeader', 'fontScaleAxis', 'fontScaleLabels', 'fontScaleAnnotate'].forEach(id => {
+    const val = { fontScaleHeader, fontScaleAxis, fontScaleLabels, fontScaleAnnotate }[id];
+    document.getElementById(id).value = val;
+    document.getElementById(id + 'Val').textContent = '×' + val.toFixed(2);
+  });
+}
+
+function applyProjectSnapshot(snap) {
+  if (!snap || snap._projectType !== PROJECT_FILE_TYPE || !Array.isArray(snap.boreholes)) {
+    throw new Error("This doesn't look like a saved transect project file.");
+  }
+
+  boreholes.length = 0;
+  snap.boreholes.forEach(bh => boreholes.push(bh));
+  manualConnections.length = 0;
+  (snap.manualConnections || []).forEach(c => manualConnections.push(c));
+  legendNotes = snap.legendNotes || {};
+  pendingSelection = new Map();
+  pendingAnchor = new Map();
+  legendPos = null; legendDrag = null; lastLegendBBox = null;
+
+  const s = snap.settings || {};
+  if (s.perspective) perspective = s.perspective;
+  if (typeof s.bhColW === 'number') bhColW = s.bhColW;
+  if (typeof s.offset3D === 'number') offset3D = s.offset3D;
+  if (typeof s.vScaleMult === 'number') vScaleMult = s.vScaleMult;
+  if (typeof s.hScaleMult === 'number') hScaleMult = s.hScaleMult;
+  if (s.paperSize) paperSize = s.paperSize;
+  if (s.paperOrient) paperOrient = s.paperOrient;
+  if (typeof s.customPaperWmm === 'number') customPaperWmm = s.customPaperWmm;
+  if (typeof s.customPaperHmm === 'number') customPaperHmm = s.customPaperHmm;
+  if (s.canvasBgColor) canvasBgColor = s.canvasBgColor;
+  if (typeof s.showPaperTexture === 'boolean') showPaperTexture = s.showPaperTexture;
+  if (typeof s.PAD_LEFT === 'number') PAD_LEFT = s.PAD_LEFT;
+  if (typeof s.PAD_RIGHT === 'number') PAD_RIGHT = s.PAD_RIGHT;
+  if (typeof s.PAD_TOP === 'number') PAD_TOP = s.PAD_TOP;
+  if (typeof s.PAD_BOTTOM === 'number') PAD_BOTTOM = s.PAD_BOTTOM;
+  if (typeof s.showLegendOnCanvas === 'boolean') showLegendOnCanvas = s.showLegendOnCanvas;
+  if (typeof s.legendIncludeFill === 'boolean') legendIncludeFill = s.legendIncludeFill;
+  if (typeof s.legendIncludeCorr === 'boolean') legendIncludeCorr = s.legendIncludeCorr;
+  if (typeof s.legendScale === 'number') legendScale = s.legendScale;
+  if (s.legendPosMode) legendPosMode = s.legendPosMode;
+  if (s.legendPos) legendPos = s.legendPos;
+  if (typeof s.depthTickStep === 'number') depthTickStep = s.depthTickStep;
+  if (typeof s.elevTickStep === 'number') elevTickStep = s.elevTickStep;
+  if (typeof s.fontScaleHeader === 'number') fontScaleHeader = s.fontScaleHeader;
+  if (typeof s.fontScaleAxis === 'number') fontScaleAxis = s.fontScaleAxis;
+  if (typeof s.fontScaleLabels === 'number') fontScaleLabels = s.fontScaleLabels;
+  if (typeof s.fontScaleAnnotate === 'number') fontScaleAnnotate = s.fontScaleAnnotate;
+
+  const checks = s.checks || {};
+  PROJECT_CHECKBOX_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && typeof checks[id] === 'boolean') el.checked = checks[id];
+  });
+  if (s.exportDPI) { const dpiEl = document.getElementById('exportDPI'); if (dpiEl) dpiEl.value = s.exportDPI; }
+  if (typeof s.exportTransparentBg === 'boolean') {
+    const tEl = document.getElementById('exportTransparentBg');
+    if (tEl) tEl.checked = s.exportTransparentBg;
+  }
+
+  syncControlsFromState();
+  renderSidebar();
+  updateCorrUI();
+  draw();
+}
+
+function loadProjectFile(file) {
+  const fr = new FileReader();
+  fr.onload = e => {
+    try {
+      const snap = JSON.parse(e.target.result);
+      if (boreholes.length && !confirm('Loading a project replaces everything currently open — profiles, correlations and settings. Continue?')) return;
+      applyProjectSnapshot(snap);
+    } catch (err) {
+      alert(`Could not load project file: ${err.message}`);
+    }
+  };
+  fr.onerror = () => alert('Could not read that file.');
+  fr.readAsText(file);
+}
+
+document.getElementById('projectFileInput').addEventListener('change', e => {
+  const file = e.target.files && e.target.files[0];
+  if (file) loadProjectFile(file);
+  e.target.value = '';
+});
+
+// ═══════════════════════════════════════════════════════════
 //  SIDEBAR
 // ═══════════════════════════════════════════════════════════
 function renderSidebar() {
   const list = document.getElementById('boreholeList');
-  const empty = document.getElementById('emptyState');
   document.getElementById('bhCount').textContent = boreholes.length;
 
+  // Rebuilt fresh every call (not a captured reference to the original
+  // static node) — #emptyState lives inside #boreholeList, so the
+  // innerHTML='' below destroys it every time; re-creating the markup
+  // here means the empty state still works correctly no matter how many
+  // times profiles have been imported and removed in this session.
   list.innerHTML = '';
-  if (!boreholes.length) { list.appendChild(empty); return; }
+  if (!boreholes.length) {
+    list.innerHTML = '<div class="empty-state" id="emptyState">No profiles loaded yet.<br>Import JSON or TXT files above.</div>';
+    return;
+  }
 
   boreholes.forEach((bh, idx) => {
     const item = document.createElement('div');
@@ -2074,12 +3080,50 @@ const canvas = document.getElementById('transectCanvas');
 const ctx    = canvas.getContext('2d');
 window.__screenCtx = ctx;   // default render target for draw()
 
-const PAD_LEFT   = 80;
-const PAD_RIGHT  = 190;
-const PAD_TOP    = 110;
-const PAD_BOTTOM = 90;
+// A hidden canvas used purely for text-metrics (wrapping/legend layout) so
+// that measuring text never disturbs the state of the real render targets.
+const __measureCanvas = document.createElement('canvas');
+const __measureCtx    = __measureCanvas.getContext('2d');
+function measureTextWidth(font, text) {
+  __measureCtx.font = font;
+  return __measureCtx.measureText(String(text ?? '')).width;
+}
+function wrapTextLines(text, font, maxWidth) {
+  if (!text) return [];
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const test = cur ? cur + ' ' + w : w;
+    if (cur && measureTextWidth(font, test) > maxWidth) {
+      lines.push(cur);
+      cur = w;
+    } else {
+      cur = test;
+    }
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
 
-function draw(_targetCtx, _scale, _mode) {
+// Pushes a sorted list of {y, ...} items apart just enough that consecutive
+// items are at least minGap apart, keeping earlier items in place and only
+// nudging later ones downward. Used to de-overlap the several kinds of
+// right-hand-side text that can land at nearly the same depth (per-layer
+// depth ticks, disturbance-zone tags, find markers) — each keeps its own
+// true-depth tick/leader mark, only the TEXT itself gets nudged.
+function resolveLabelPositions(items, minGap) {
+  if (!items.length) return [];
+  const sorted = items.map((it, i) => ({ y: it.y, origIndex: i })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i].y < sorted[i - 1].y + minGap) sorted[i].y = sorted[i - 1].y + minGap;
+  }
+  const out = new Array(items.length);
+  sorted.forEach(it => { out[it.origIndex] = it.y; });
+  return out;
+}
+
+function draw(_targetCtx, _scale, _mode, _transparentBg) {
   // Render target indirection: by default we draw to the on-screen canvas/ctx.
   // Exports pass an offscreen hi-DPI context (raster) or an SVG recorder
   // (vector). `scale` multiplies the paper size for high-DPI raster output;
@@ -2094,10 +3138,19 @@ function draw(_targetCtx, _scale, _mode) {
   if (noData) noData.style.display = ordered.length ? 'none' : 'flex';
 
   const showInterpol   = document.getElementById('showInterpol').checked;
-  const showMarkers    = document.getElementById('showMarkers').checked;
+  const showMarkerTicks = document.getElementById('showMarkerTicks')?.checked ?? true;
+  const showMarkerText  = document.getElementById('showMarkerText')?.checked ?? true;
+  const showObservationOverlay = document.getElementById('showObservationOverlay')?.checked ?? true;
+  const showUnits      = document.getElementById('showUnits').checked;
   const showCompaction = document.getElementById('showCompaction').checked;
+  const showDisturbedHatch = document.getElementById('showDisturbedHatch')?.checked ?? true;
+  const showTransitions = document.getElementById('showTransitions')?.checked ?? true;
+  const showTotalDepth = document.getElementById('showTotalDepth')?.checked ?? false;
   const showLabels     = document.getElementById('showLabels').checked;
   const showTexture    = document.getElementById('showTexture')?.checked ?? true;
+  const showGrainSizeColumn = document.getElementById('showGrainSizeColumn')?.checked ?? false;
+  const showBoreholeOutline = document.getElementById('showBoreholeOutline')?.checked ?? true;
+  const showLayerDepths = document.getElementById('showLayerDepths')?.checked ?? false;
   const showDepthAxis  = document.getElementById('showDepthAxis').checked;
   const showGrid       = document.getElementById('showGrid').checked;
   const showElevAlign  = document.getElementById('showElevAlign').checked;
@@ -2111,20 +3164,52 @@ function draw(_targetCtx, _scale, _mode) {
   }
 
   // ── Paper canvas size (× scale for hi-DPI export) ──
+  // `paper` is the nominal page area used for all plot layout/auto-fit math
+  // below (unaffected by the legend). In 'auto' position mode we append
+  // extra vertical space below the nominal page height for the legend; in
+  // 'manual' mode the legend floats at a person-chosen (draggable) spot
+  // within the existing page, so no extra space is reserved.
   const paper = getPaperPx();
+  const LEGEND_GAP = 22;
+  let legendData = null, legendBlockH = 0, legendBlockW = 0, legendX = 0, legendY = 0;
+  if (showLegendOnCanvas) {
+    legendData = collectLegendItems(ordered);
+    if (legendData.fillItems.length || legendData.corrItems.length) {
+      const isManual = legendPosMode === 'manual';
+      legendBlockW = isManual
+        ? Math.min(400 * legendScale, Math.max(paper.w - 40, 180 * legendScale))
+        : Math.min(paper.w - PAD_LEFT - PAD_RIGHT, 480 * legendScale);
+      legendBlockH = measureLegendHeight(legendData, legendBlockW);
+      if (isManual) {
+        const defaultX = paper.w - legendBlockW - 20;
+        const defaultY = 20;
+        const p = legendPos || { x: defaultX, y: defaultY };
+        legendX = Math.max(0, Math.min(p.x, Math.max(0, paper.w - legendBlockW)));
+        legendY = Math.max(0, Math.min(p.y, Math.max(0, paper.h - legendBlockH)));
+      } else {
+        legendX = PAD_LEFT;
+        legendY = paper.h + LEGEND_GAP;
+      }
+    } else {
+      legendData = null;
+    }
+  }
+  const legendExtendsPage = legendData && legendPosMode !== 'manual';
+  const pageH = paper.h + (legendExtendsPage ? LEGEND_GAP + legendBlockH + 24 : 0);
+
   canvas.width  = Math.round(paper.w * scale);
-  canvas.height = Math.round(paper.h * scale);
+  canvas.height = Math.round(pageH * scale);
   // All layout below is in logical (96-dpi) paper coordinates; scale the
   // context so a hi-DPI raster is simply a magnified copy.
   if (ctx.setTransform) ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
   // Update label (only meaningful for the on-screen canvas)
-  const s = PAPER_SIZES[paperSize];
+  const s = paperSize === 'Custom' ? { w: customPaperWmm, h: customPaperHmm } : PAPER_SIZES[paperSize];
   const wMM = paperOrient==='landscape' ? s.w : s.h;
   const hMM = paperOrient==='landscape' ? s.h : s.w;
   const dimsLabel = document.getElementById('paperDimsLabel');
   if (dimsLabel && !_targetCtx) dimsLabel.textContent =
-    `${wMM} × ${hMM} mm · 96 dpi · ${paper.w}×${paper.h}px`;
+    `${wMM} × ${hMM} mm · 96 dpi · ${paper.w}×${paper.h}px` + (legendExtendsPage ? ` (+legend ${Math.round(legendBlockH)}px)` : '');
 
   // ── Vertical extents ──
   let globalMinDepth = Infinity, globalMaxDepth = -Infinity;
@@ -2152,12 +3237,12 @@ function draw(_targetCtx, _scale, _mode) {
     });
   }
 
-  const depthRange = hasElev
+  const depthRange = (hasElev
     ? (globalMaxElev - globalMinElev)
-    : (globalMaxDepth - globalMinDepth) || 1;
+    : (globalMaxDepth - globalMinDepth)) || 1;
 
   // ── Auto vertical scale: fit depthRange into available canvas height ──
-  const availH = canvas.height - PAD_TOP - PAD_BOTTOM - offset3D;
+  const availH = paper.h - PAD_TOP - PAD_BOTTOM - offset3D;
   const autoVScalePx = availH / (depthRange || 1);  // px per metre
   const scalePx = autoVScalePx * vScaleMult;
 
@@ -2170,7 +3255,7 @@ function draw(_targetCtx, _scale, _mode) {
   // Available horizontal space for all borehole spans
   const n = ordered.length;
   // Total H space = available - n columns - offset
-  const availW = canvas.width - PAD_LEFT - PAD_RIGHT - offset3D - n * bhColW;
+  const availW = paper.w - PAD_LEFT - PAD_RIGHT - offset3D - n * bhColW;
   // Auto horizontal scale: px per real-world metre of transect distance
   const autoHScalePxPerM = availW / transectSpanM;
   const hScalePxPerM = autoHScalePxPerM * hScaleMult;
@@ -2196,22 +3281,31 @@ function draw(_targetCtx, _scale, _mode) {
     return PAD_TOP + (depth - globalMinDepth) * scalePx;
   }
 
-  // ── Background ──
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // ── Background (covers the full page, including any appended legend area) ──
+  const isTransparentExport = !!_transparentBg;
+  if (isTransparentExport) {
+    ctx.clearRect(0, 0, paper.w, pageH);
+  } else {
+    ctx.fillStyle = canvasBgColor;
+    ctx.fillRect(0, 0, paper.w, pageH);
+  }
 
-  // Subtle grid paper texture
-  ctx.strokeStyle = 'rgba(0,0,0,.06)';
-  ctx.lineWidth = .5;
-  const gridStep = 20;
-  for (let x=0; x<canvas.width; x+=gridStep) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
-  for (let y=0; y<canvas.height; y+=gridStep) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+  // Subtle grid paper texture (decorative page texture, independent of the
+  // "Horizontal grid lines" data toggle further below)
+  if (showPaperTexture && !isTransparentExport) {
+    ctx.strokeStyle = 'rgba(0,0,0,.06)';
+    ctx.lineWidth = .5;
+    const gridStep = 20;
+    for (let x=0; x<paper.w; x+=gridStep) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,pageH); ctx.stroke(); }
+    for (let y=0; y<pageH; y+=gridStep) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(paper.w,y); ctx.stroke(); }
+  }
 
   // ── Depth / elevation axis (left) ──
   if (showDepthAxis) {
-    const depthStep = depthRange <= 1 ? 0.1 : depthRange <= 2 ? 0.25 : depthRange <= 5 ? 0.5 : depthRange <= 10 ? 1 : depthRange <= 20 ? 2 : 5;
+    const depthStep = depthTickStep > 0 ? depthTickStep :
+      (depthRange <= 1 ? 0.1 : depthRange <= 2 ? 0.25 : depthRange <= 5 ? 0.5 : depthRange <= 10 ? 1 : depthRange <= 20 ? 2 : 5);
 
-    ctx.font = '500 10px "JetBrains Mono"';
+    ctx.font = `500 ${10 * fontScaleAxis}px "JetBrains Mono"`;
     ctx.textAlign = 'right';
 
     let d = Math.ceil(globalMinDepth / depthStep) * depthStep;
@@ -2229,7 +3323,7 @@ function draw(_targetCtx, _scale, _mode) {
     ctx.translate(16, PAD_TOP + depthRange * scalePx / 2);
     ctx.rotate(-Math.PI/2);
     ctx.fillStyle = '#aaaaaa';
-    ctx.font = '600 9px "JetBrains Mono"';
+    ctx.font = `600 ${9 * fontScaleAxis}px "JetBrains Mono"`;
     ctx.textAlign = 'center';
     ctx.fillText('DEPTH (m)', 0, 0);
     ctx.restore();
@@ -2237,12 +3331,13 @@ function draw(_targetCtx, _scale, _mode) {
 
   // ── Elevation axis (right) ──
   if (showDepthAxis && hasElev) {
-    const rightX = canvas.width - PAD_RIGHT + 24;
+    const rightX = paper.w - PAD_RIGHT + 24;
     ctx.fillStyle = '#5a4e3a';
-    ctx.font = '500 9px "JetBrains Mono"';
+    ctx.font = `500 ${9 * fontScaleAxis}px "JetBrains Mono"`;
     ctx.textAlign = 'left';
 
-    const elevStep = depthRange <= 2 ? 0.25 : depthRange <= 5 ? 0.5 : depthRange <= 10 ? 1 : 2;
+    const elevStep = elevTickStep > 0 ? elevTickStep :
+      (depthRange <= 2 ? 0.25 : depthRange <= 5 ? 0.5 : depthRange <= 10 ? 1 : 2);
     let e = Math.ceil(globalMinElev / elevStep) * elevStep;
     while (e <= globalMaxElev + 0.001) {
       const bh0 = ordered[0];
@@ -2254,10 +3349,10 @@ function draw(_targetCtx, _scale, _mode) {
       e += elevStep;
     }
     ctx.save();
-    ctx.translate(canvas.width - 14, PAD_TOP + depthRange*scalePx/2);
+    ctx.translate(paper.w - 14, PAD_TOP + depthRange*scalePx/2);
     ctx.rotate(Math.PI/2);
     ctx.fillStyle = '#aaaaaa';
-    ctx.font = '600 9px "JetBrains Mono"';
+    ctx.font = `600 ${9 * fontScaleAxis}px "JetBrains Mono"`;
     ctx.textAlign = 'center';
     ctx.fillText('ELEVATION (m a.s.l.)', 0, 0);
     ctx.restore();
@@ -2266,12 +3361,12 @@ function draw(_targetCtx, _scale, _mode) {
   // ── Horizontal distance axis (bottom) ──
   if (showDepthAxis && n > 1) {
     // Draw a horizontal axis line
-    const axisY = canvas.height - PAD_BOTTOM + 30;
+    const axisY = paper.h - PAD_BOTTOM + 30;
     ctx.strokeStyle = '#aaaaaa';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(PAD_LEFT, axisY);
-    ctx.lineTo(canvas.width - PAD_RIGHT + 10, axisY);
+    ctx.lineTo(paper.w - PAD_RIGHT + 10, axisY);
     ctx.stroke();
 
     // Tick + label at each borehole
@@ -2282,15 +3377,15 @@ function draw(_targetCtx, _scale, _mode) {
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x, axisY); ctx.lineTo(x, axisY + 5); ctx.stroke();
       ctx.fillStyle = '#5a4e3a';
-      ctx.font = '500 9px "JetBrains Mono"';
+      ctx.font = `500 ${9 * fontScaleAxis}px "JetBrains Mono"`;
       ctx.textAlign = 'center';
       ctx.fillText(dist + 'm', x, axisY + 16);
     });
 
     ctx.fillStyle = '#aaaaaa';
-    ctx.font = '600 8px "JetBrains Mono"';
+    ctx.font = `600 ${8 * fontScaleAxis}px "JetBrains Mono"`;
     ctx.textAlign = 'center';
-    ctx.fillText('DISTANCE ALONG TRANSECT (m)', canvas.width/2, axisY + 28);
+    ctx.fillText('DISTANCE ALONG TRANSECT (m)', paper.w/2, axisY + 28);
   }
 
   // ── Grid lines ──
@@ -2299,7 +3394,8 @@ function draw(_targetCtx, _scale, _mode) {
     ctx.lineWidth = .7;
     ctx.setLineDash([4,6]);
     const depthRange2 = globalMaxDepth - globalMinDepth || 1;
-    const gridDepthStep = depthRange2 <= 2 ? 0.25 : depthRange2 <= 5 ? 0.5 : depthRange2 <= 10 ? 1 : depthRange2 <= 20 ? 2 : 5;
+    const gridDepthStep = depthTickStep > 0 ? depthTickStep :
+      (depthRange2 <= 2 ? 0.25 : depthRange2 <= 5 ? 0.5 : depthRange2 <= 10 ? 1 : depthRange2 <= 20 ? 2 : 5);
     let d = Math.ceil(globalMinDepth / gridDepthStep) * gridDepthStep;
     const rightEdge = bhX(n-1) + bhColW + offset3D + 10;
     while (d <= globalMaxDepth) {
@@ -2313,7 +3409,11 @@ function draw(_targetCtx, _scale, _mode) {
   // ── Manual correlation lines ──
   if (showInterpol && manualConnections.length > 0) {
     manualConnections.forEach(conn => {
-      // Resolve each side to its merged depth extent (min depthFrom, max depthTo)
+      // Resolve each side to its depth extent. 'full' spans the full
+      // min(depthFrom)..max(depthTo) of the selected layers, as before.
+      // 'top'/'bottom' collapse the side to a single point at that edge —
+      // a pinch-out wedge, for "may not be documented here but could
+      // continue" correlations.
       const resolved = conn.sides
         .map(side => {
           const bhIdx = ordered.findIndex(b => b._uid === side.bhUid);
@@ -2321,9 +3421,14 @@ function draw(_targetCtx, _scale, _mode) {
           const bh = ordered[bhIdx];
           const layers = side.layerIndices.map(li => bh.layers[li]).filter(Boolean);
           if (!layers.length) return null;
-          const top = Math.min(...layers.map(l => l.depthFrom));
-          const bot = Math.max(...layers.map(l => l.depthTo));
-          return { bhIdx, bh, top, bot, color: layers[0].color };
+          const depthFrom = Math.min(...layers.map(l => l.depthFrom));
+          const depthTo   = Math.max(...layers.map(l => l.depthTo));
+          let top, bot;
+          if (side.anchor === 'top') { top = bot = depthFrom; }
+          else if (side.anchor === 'bottom') { top = bot = depthTo; }
+          else { top = depthFrom; bot = depthTo; }
+          const disturbed = layers.some(l => l.layerType === 'disturbed');
+          return { bhIdx, bh, top, bot, color: layers[0].color, disturbed };
         })
         .filter(Boolean)
         .sort((a, b) => a.bhIdx - b.bhIdx);
@@ -2333,7 +3438,12 @@ function draw(_targetCtx, _scale, _mode) {
 
       for (let ri = 0; ri < resolved.length - 1; ri++) {
         const a = resolved[ri], b = resolved[ri + 1];
-        const ax = bhX(a.bhIdx) + bhColW;
+        // A's right edge follows its actual (possibly tapered) drawn edge
+        // at each depth in grain-size profile mode; B's left edge is
+        // always the spine (x), which never tapers, so it needs no
+        // adjustment either way.
+        const axTop = bhX(a.bhIdx) + edgeWidthAtDepth(a.bh, a.top, showGrainSizeColumn);
+        const axBot = bhX(a.bhIdx) + edgeWidthAtDepth(a.bh, a.bot, showGrainSizeColumn);
         const bx = bhX(b.bhIdx);
         const ayTop = depthToY(a.top, a.bh);
         const ayBot = depthToY(a.bot, a.bh);
@@ -2341,19 +3451,38 @@ function draw(_targetCtx, _scale, _mode) {
         const byBot = depthToY(b.bot, b.bh);
 
         ctx.beginPath();
-        ctx.moveTo(ax, ayTop);
+        ctx.moveTo(axTop, ayTop);
         ctx.lineTo(bx, byTop);
         ctx.lineTo(bx, byBot);
-        ctx.lineTo(ax, ayBot);
+        ctx.lineTo(axBot, ayBot);
         ctx.closePath();
         ctx.fillStyle = hexToRgba(color, 0.22);
         ctx.fill();
 
+        // Heterogeneous/reworked units get the same horizontal-hatch
+        // overlay used in the legend swatch, so a correlated disturbed
+        // unit reads as textured here too, not just a flat tint.
+        if (showDisturbedHatch && (a.disturbed || b.disturbed)) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(axTop, ayTop); ctx.lineTo(bx, byTop);
+          ctx.lineTo(bx, byBot); ctx.lineTo(axBot, ayBot);
+          ctx.closePath();
+          ctx.clip();
+          ctx.strokeStyle = 'rgba(0,0,0,.22)'; ctx.lineWidth = 1;
+          const minY = Math.min(ayTop, byTop), maxY = Math.max(ayBot, byBot);
+          const minX = Math.min(axTop, axBot, bx), maxX = Math.max(axTop, axBot, bx);
+          for (let hy = minY + 3; hy < maxY; hy += 6) {
+            ctx.beginPath(); ctx.moveTo(minX, hy); ctx.lineTo(maxX, hy); ctx.stroke();
+          }
+          ctx.restore();
+        }
+
         ctx.strokeStyle = hexToRgba(color, 0.7);
         ctx.lineWidth = 1.2;
         ctx.setLineDash([4, 3]);
-        ctx.beginPath(); ctx.moveTo(ax, ayTop); ctx.lineTo(bx, byTop); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(ax, ayBot);  ctx.lineTo(bx, byBot);  ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(axTop, ayTop); ctx.lineTo(bx, byTop); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(axBot, ayBot);  ctx.lineTo(bx, byBot);  ctx.stroke();
         ctx.setLineDash([]);
       }
     });
@@ -2389,7 +3518,11 @@ function draw(_targetCtx, _scale, _mode) {
     const x = bhX(i);
 
     // ── 3D side face ──
-    if (offset3D > 0) {
+    // Skipped in grain-size profile mode: a single parallelogram at the
+    // full column width no longer matches a column whose right edge steps
+    // in/out per layer, so it would look like a floating, disconnected
+    // shape rather than a solid extrusion of the tapered log.
+    if (offset3D > 0 && !showGrainSizeColumn) {
       const topY    = depthToY(globalMinDepth, bh);
       const bottomY = depthToY(globalMaxDepth, bh);
       ctx.beginPath();
@@ -2406,31 +3539,64 @@ function draw(_targetCtx, _scale, _mode) {
     }
 
     // ── Layer rectangles ──
-    bh.layers.forEach(l => {
+    // Grain-size / weathering profile column geometry: precompute each
+    // layer's top/bottom widths up front (per-borehole) so boundary lines
+    // can reference the wider of two abutting layers and avoid a seam.
+    const gwArr = bh.layers.map(l => showGrainSizeColumn ? layerTopBotWidths(l) : { wTop: bhColW, wBot: bhColW });
+
+    bh.layers.forEach((l, li) => {
       const y1 = depthToY(l.depthFrom, bh);
       const y2 = depthToY(l.depthTo,   bh);
       const h  = Math.max(y2 - y1, 1);
+      const { wTop, wBot } = gwArr[li];
+      const tapered = showGrainSizeColumn && (wTop !== bhColW || wBot !== bhColW);
+      // An unclassified/"no recovery" interval (Core Logger's blank "-"
+      // marker) is left fully transparent instead of solid white, so it
+      // reads as an honest gap rather than an opaque white block sitting
+      // on top of a custom canvas background colour.
+      const isBlank = l.officialDesc === '-' && l.layerType !== 'missing';
 
-      ctx.fillStyle = l.color;
-      ctx.fillRect(x, y1, bhColW, h);
+      if (!isBlank) {
+        ctx.fillStyle = l.color;
+        if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.fill(); }
+        else ctx.fillRect(x, y1, bhColW, h);
 
-      const grad = ctx.createLinearGradient(x, y1, x+bhColW, y1);
-      grad.addColorStop(0,   'rgba(255,255,255,.18)');
-      grad.addColorStop(0.4, 'rgba(255,255,255,0)');
-      grad.addColorStop(1,   'rgba(0,0,0,.12)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(x, y1, bhColW, h);
+        const grad = ctx.createLinearGradient(x, y1, x+bhColW, y1);
+        grad.addColorStop(0,   'rgba(255,255,255,.18)');
+        grad.addColorStop(0.4, 'rgba(255,255,255,0)');
+        grad.addColorStop(1,   'rgba(0,0,0,.12)');
+        ctx.fillStyle = grad;
+        if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.fill(); }
+        else ctx.fillRect(x, y1, bhColW, h);
+      }
+
+      // Crisp outline along the tapered (diagonal) right edge, so the
+      // grain-size profile reads clearly even where fill colours are close.
+      if (tapered) {
+        ctx.save();
+        ctx.strokeStyle = darken(l.color, 20); ctx.lineWidth = .6;
+        ctx.beginPath(); ctx.moveTo(x + wTop, y1); ctx.lineTo(x + wBot, y1 + h); ctx.stroke();
+        ctx.restore();
+      }
 
       // ── Grain-size texture (sand/silt/clay/gravel ornament) ──
       // Mirrors the CoreLogger: for a gradational layer the texture cross-
-      // fades from the top soil to the base soil down the column; clipped
-      // to the (fixed-width) layer rect so it never bleeds past the edges.
-      if (showTexture && !isRec && l.layerType !== 'missing') {
+      // fades from the top soil to the base soil down the column; for a
+      // multi-soil ("banded") layer, each soil gets its own texture at
+      // 1/N the base density; clipped to the layer body (tapered when the
+      // grain-size profile style is on, otherwise the plain fixed-width
+      // rect) so it never bleeds past the edges either way.
+      if (showTexture && !isRec && l.layerType !== 'missing' && !isBlank) {
         const topCode = (typeof layerMainCode === 'function') ? layerMainCode(l) : null;
         const botCode = l.gradeTo || topCode;
+        const isMulti = topCode && topCode.includes('/');
         ctx.save();
-        ctx.beginPath(); ctx.rect(x, y1, bhColW, h); ctx.clip();
-        if (!l.gradeTo || botCode === topCode) {
+        if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.clip(); }
+        else { ctx.beginPath(); ctx.rect(x, y1, bhColW, h); ctx.clip(); }
+        if (isMulti) {
+          const parts = topCode.split('/').map(s => s.trim()).filter(Boolean);
+          parts.forEach(code => drawGrainTexture(ctx, code, x, y1, bhColW, h, 1 / parts.length));
+        } else if (!l.gradeTo || botCode === topCode) {
           drawGrainTexture(ctx, topCode, x, y1, bhColW, h, 1);
         } else {
           const bands = Math.max(4, Math.min(16, Math.round(h / 10)));
@@ -2446,11 +3612,10 @@ function draw(_targetCtx, _scale, _mode) {
       }
 
       // ── Find / observation textures (from structured markers) ──
-      // These visualise the same finds as the marker flags, so they are tied
-      // to BOTH the texture layer (showTexture) AND the markers toggle
-      // (showMarkers): unchecking "Markers & horizon indicators" hides them.
-      // Drawn at 60% opacity and clipped to the layer rect.
-      if (showTexture && showMarkers && !isRec && Array.isArray(l.markers)) {
+      // Independently toggleable now: this is the visual texture ornament
+      // itself (shell/charcoal/root stipple etc.), separate from the
+      // marker tick/leader-line and from its text label.
+      if (showObservationOverlay && !isRec && Array.isArray(l.markers)) {
         l.markers.forEach(m => {
           if (!m.findType) return;
           const typeDesc = {
@@ -2470,23 +3635,25 @@ function draw(_targetCtx, _scale, _mode) {
           if (fh <= 0) return;
           ctx.save();
           ctx.globalAlpha = 0.6;
-          ctx.beginPath(); ctx.rect(x, y1, bhColW, h); ctx.clip();   // never leave the layer
+          if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.clip(); }
+          else { ctx.beginPath(); ctx.rect(x, y1, bhColW, h); ctx.clip(); }   // never leave the layer
           drawTextureOverlay(ctx, typeDesc, x + 1, fyTop, bhColW - 2, fh);
           ctx.restore();
         });
       }
 
       // Disturbed hatch
-      if (l.layerType === 'disturbed') {
+      if (l.layerType === 'disturbed' && showDisturbedHatch) {
         ctx.save();
         ctx.strokeStyle = 'rgba(0,0,0,.3)'; ctx.lineWidth = 1;
-        ctx.rect(x,y1,bhColW,h); ctx.clip();
+        if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.clip(); }
+        else { ctx.rect(x,y1,bhColW,h); ctx.clip(); }
         for (let hx = x - h; hx < x + bhColW + h; hx += 6) {
           ctx.beginPath(); ctx.moveTo(hx, y1); ctx.lineTo(hx+h, y2); ctx.stroke();
         }
         ctx.restore();
       }
-      // Missing
+      // Missing (always full width, matching the Core Logger)
       if (l.layerType === 'missing') {
         ctx.save();
         ctx.setLineDash([3,3]); ctx.strokeStyle = 'rgba(150,50,50,.5)'; ctx.lineWidth = 1;
@@ -2497,21 +3664,48 @@ function draw(_targetCtx, _scale, _mode) {
         ctx.restore();
       }
 
-      // Layer borders
+      // Layer borders — a plain solid line by default, but if this boundary
+      // has a recorded transition character (set in the Core Logger's
+      // boundary editor), draw that instead: dashed for a gradual/diffuse
+      // contact, a small sine perturbation for a wavy/irregular one. Sharp
+      // contacts fall through to the same solid line as "no data". Width
+      // spans the WIDER of this layer's top and the previous layer's base
+      // so a boundary between two differently-tapered layers never leaves
+      // a gap.
+      const boundaryW = Math.max(wTop, li > 0 ? gwArr[li-1].wBot : wTop);
+      const trans = (showTransitions && Array.isArray(bh.transitions))
+        ? bh.transitions.find(t => Math.abs(t.depth - l.depthFrom) < 1e-6)
+        : null;
       ctx.strokeStyle = darken(l.color, 25); ctx.lineWidth = .5;
-      ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x+bhColW,y1); ctx.stroke();
-      if (l === bh.layers[bh.layers.length-1]) {
-        ctx.beginPath(); ctx.moveTo(x,y2); ctx.lineTo(x+bhColW,y2); ctx.stroke();
+      if (trans && trans.sharpness != null && trans.sharpness < 0.4) {
+        // Gradual/diffuse contact — soft dashed line
+        ctx.save(); ctx.setLineDash([2, 2]);
+        ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x + boundaryW, y1); ctx.stroke();
+        ctx.restore();
+      } else if (trans && trans.amplitude > 1) {
+        // Wavy/irregular contact — small sine ripple across the boundary
+        const amp = Math.min(3, trans.amplitude / 3);
+        ctx.beginPath();
+        for (let sx = 0; sx <= boundaryW; sx += 2) {
+          const sy = y1 + Math.sin((sx / boundaryW) * Math.PI * 3) * amp;
+          if (sx === 0) ctx.moveTo(x + sx, sy); else ctx.lineTo(x + sx, sy);
+        }
+        ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x+boundaryW,y1); ctx.stroke();
+      }
+      if (li === bh.layers.length-1) {
+        ctx.beginPath(); ctx.moveTo(x,y2); ctx.lineTo(x+wBot,y2); ctx.stroke();
       }
 
       // 3D top cap
-      if (offset3D > 0 && l === bh.layers[0]) {
+      if (offset3D > 0 && li === 0) {
         const ox = offset3D, oy = offset3D * .55;
         ctx.beginPath();
         ctx.moveTo(x,         y1);
         ctx.lineTo(x+ox,      y1-oy);
-        ctx.lineTo(x+bhColW+ox, y1-oy);
-        ctx.lineTo(x+bhColW,  y1);
+        ctx.lineTo(x+wTop+ox, y1-oy);
+        ctx.lineTo(x+wTop,    y1);
         ctx.closePath();
         ctx.fillStyle = lighten(l.color, 40);
         ctx.fill();
@@ -2519,57 +3713,220 @@ function draw(_targetCtx, _scale, _mode) {
         ctx.stroke();
       }
 
-      // Layer label
+      // Layer label — centred within the visible body (the tapered width
+      // when the grain-size profile style is on, otherwise the full
+      // column) so the text never floats over blank space past a narrow
+      // taper.
       if (showLabels && h > 10) {
         const label = displayCode(l);
         if (label) {
+          const bodyW = tapered ? Math.max(Math.min(wTop, wBot), 10) : bhColW;
           ctx.save();
-          ctx.font = `600 ${Math.min(9,h*0.45)}px "JetBrains Mono"`;
+          ctx.font = `600 ${Math.min(9,h*0.45) * fontScaleLabels}px "JetBrains Mono"`;
           ctx.fillStyle = isDark(l.color) ? 'rgba(255,255,255,.85)' : 'rgba(0,0,0,.7)';
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.beginPath(); ctx.rect(x+2, y1, bhColW-4, h); ctx.clip();
-          ctx.fillText(label, x + bhColW/2, y1 + h/2);
+          if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.clip(); }
+          else { ctx.beginPath(); ctx.rect(x+2, y1, bhColW-4, h); ctx.clip(); }
+          ctx.fillText(label, x + bodyW/2, y1 + h/2);
           ctx.restore();
         }
       }
+
+      // KA5 soil horizon (Ah, Go, Cv…) — a small tag in the layer's top-left
+      // corner, separate from the centred lithology code above. Tied to the
+      // marker TEXT toggle since it's exactly that: an indicator label,
+      // not part of the lithology itself. Low-confidence auto-
+      // classifications are shown at reduced opacity so a glance at the
+      // transect flags which horizons need review.
+      if (showMarkerText && l.horizon && h > 12) {
+        ctx.save();
+        ctx.font = `600 ${Math.min(8, h*0.4) * fontScaleAnnotate}px "JetBrains Mono"`;
+        ctx.fillStyle = l.horizonConf === 'low' ? 'rgba(80,50,20,.55)' : 'rgba(80,50,20,.85)';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        if (tapered) { layerBodyPath(ctx, x, y1, h, wTop, wBot); ctx.clip(); }
+        else { ctx.beginPath(); ctx.rect(x+2, y1, bhColW-4, h); ctx.clip(); }
+        ctx.fillText(l.horizon, x + 3, y1 + 2);
+        ctx.restore();
+      }
     });
 
-    // Borehole outline
-    ctx.strokeStyle = 'rgba(80,60,40,.4)'; ctx.lineWidth = 1;
-    const topY2    = depthToY(globalMinDepth, bh);
-    const bottomY2 = depthToY(globalMaxDepth, bh);
-    ctx.strokeRect(x, topY2, bhColW, bottomY2-topY2);
+    // Borehole outline — a full rectangle at the reference bhColW, spanning
+    // THIS core's own recorded layers (not the transect-wide depth range —
+    // using globalMinDepth/globalMaxDepth here would stretch every core's
+    // box down to the deepest core in the transect, well past where its
+    // own data actually ends). Adjacent boreholes keep a clear boundary
+    // even where the grain-size profile's fill tapers narrower than the
+    // reserved column width. Toggleable: some people prefer the cleaner
+    // look without it once their data's spacing/coordinates are correct.
+    const bhMinDepth = bh.layers.length ? bh.layers[0].depthFrom : globalMinDepth;
+    const bhMaxDepth = bh.layers.length ? bh.layers[bh.layers.length - 1].depthTo : globalMaxDepth;
+    const topY2    = depthToY(bhMinDepth, bh);
+    const bottomY2 = depthToY(bhMaxDepth, bh);
+    if (showBoreholeOutline) {
+      ctx.strokeStyle = 'rgba(80,60,40,.4)'; ctx.lineWidth = 1;
+      ctx.strokeRect(x, topY2, bhColW, bottomY2-topY2);
+    }
 
-    // Compaction lines
+    // ── Right-hand-side text: per-layer depth ticks, disturbance-zone
+    // tags, and find markers all land in the same narrow strip to the
+    // right of the column, and can easily fall at nearly the same depth.
+    // Structural marks (ticks, dots, dashed boxes) stay at their true
+    // depth; the TEXT is collected here and given a minimum vertical gap
+    // in one combined pass below, with a short leader line back to the
+    // true depth wherever a label actually had to move.
+    const rightLabelItems = [];
+
+    // ── Per-layer depth labels (cm from top of THIS core) ──
+    // Independent of the left/right depth-and-elevation axis — these are
+    // the raw recorded depths at each layer boundary, cumulative from 0 at
+    // the top of this specific core (matches how field logs are typically
+    // annotated by hand).
+    if (showLayerDepths && bh.layers.length) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(90,78,58,.6)'; ctx.lineWidth = 1;
+      const tickLen = 5;
+
+      const yTopLbl = depthToY(bh.layers[0].depthFrom, bh);
+      const rTop = x + gwArr[0].wTop;
+      ctx.beginPath(); ctx.moveTo(rTop, yTopLbl); ctx.lineTo(rTop + tickLen, yTopLbl); ctx.stroke();
+      rightLabelItems.push({
+        y: yTopLbl, trueY: yTopLbl, tickX: rTop + tickLen + 2,
+        text: `${Math.round(bh.layers[0].depthFrom * 100)} cm`,
+        font: '500 8px "JetBrains Mono"', color: '#5a4e3a', leaderColor: 'rgba(90,78,58,.5)'
+      });
+
+      bh.layers.forEach((l, li) => {
+        const yB = depthToY(l.depthTo, bh);
+        const rEdge = x + gwArr[li].wBot;
+        ctx.beginPath(); ctx.moveTo(rEdge, yB); ctx.lineTo(rEdge + tickLen, yB); ctx.stroke();
+        rightLabelItems.push({
+          y: yB, trueY: yB, tickX: rEdge + tickLen + 2,
+          text: `${Math.round(l.depthTo * 100)} cm`,
+          font: '500 8px "JetBrains Mono"', color: '#5a4e3a', leaderColor: 'rgba(90,78,58,.5)'
+        });
+      });
+      ctx.restore();
+    }
+
+    // Disturbance / core-condition zones — a depth range when the Core
+    // Logger recorded one (depthTo), otherwise a single marked depth as
+    // before. Type is abbreviated so the transect isn't crowded with long
+    // strings; "Sediment gap / missing" gets a distinct hollow/void
+    // treatment since it represents an absence of core, not a disturbance
+    // texture, everything else keeps the dashed disturbance-line look.
+    const DIST_ABBR = {
+      'Disturbed / reworked': 'DIST', 'Sediment gap / missing': 'GAP',
+      'Compaction': 'COMP', 'Extension': 'EXT', 'Shearing/Smearing': 'SHEAR',
+      'Liquefaction': 'LIQ', 'Brecciation': 'BREC', 'Upward distortion': 'UP-DEF',
+      'Downward distortion': 'DN-DEF', 'Void': 'VOID', 'Flow-in': 'FLOW-IN',
+      'Fall-in': 'FALL-IN', 'Sediment loss': 'LOSS', 'Density sorting': 'SORT',
+    };
     if (showCompaction && bh.compactions) {
       bh.compactions.forEach(cp => {
-        const cy = depthToY(cp.depth, bh);
-        if (cy < topY2 || cy > bottomY2) return;
+        const cy1 = depthToY(cp.depth, bh);
+        const cy2 = (cp.depthTo != null) ? depthToY(cp.depthTo, bh) : null;
+        if (cy1 < topY2 || cy1 > bottomY2) return;
+        const isGap = cp.type === 'Sediment gap / missing';
+        const abbr  = DIST_ABBR[cp.type] || '⊕';
         ctx.save();
-        ctx.strokeStyle = '#1a4fd8'; ctx.lineWidth = 1.5; ctx.setLineDash([2,2]);
-        ctx.beginPath(); ctx.moveTo(x-4, cy); ctx.lineTo(x+bhColW+4, cy); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#1a4fd8'; ctx.font = '600 8px "JetBrains Mono"'; ctx.textAlign = 'left';
-        ctx.fillText('⊕', x + bhColW + 6, cy + 3);
+        if (cy2 != null && Math.abs(cy2 - cy1) > 2) {
+          // Range: shade the zone and outline it with a dashed box instead
+          // of just marking the top depth.
+          const zTop = Math.min(cy1, cy2), zH = Math.abs(cy2 - cy1);
+          ctx.fillStyle = isGap ? 'rgba(255,255,255,.65)' : 'rgba(26,79,216,.08)';
+          ctx.fillRect(x, zTop, bhColW, zH);
+          ctx.strokeStyle = '#1a4fd8'; ctx.lineWidth = 1.2; ctx.setLineDash([2,2]);
+          ctx.strokeRect(x+0.5, zTop+0.5, bhColW-1, zH-1);
+          ctx.setLineDash([]);
+        } else {
+          ctx.strokeStyle = '#1a4fd8'; ctx.lineWidth = 1.5; ctx.setLineDash([2,2]);
+          ctx.beginPath(); ctx.moveTo(x-4, cy1); ctx.lineTo(x+bhColW+4, cy1); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        ctx.restore();
+        rightLabelItems.push({
+          y: cy1, trueY: cy1, tickX: x + bhColW + 6,
+          text: abbr, font: '600 8px "JetBrains Mono"', color: '#1a4fd8', leaderColor: 'rgba(26,79,216,.5)'
+        });
+      });
+    }
+
+    // Stratigraphic units — brackets several layers into a broader named
+    // zone (e.g. "beach zone", "upper till"). Drawn as a bracket to the
+    // LEFT of the column, mirroring the Core Logger's own placement,
+    // deliberately on the opposite side from markers/horizons/disturbance
+    // labels (all on the right) so the two don't collide.
+    if (showUnits && Array.isArray(bh.units) && bh.units.length) {
+      bh.units.forEach(u => {
+        const uy1 = depthToY(u.depthFrom, bh);
+        const uy2 = depthToY(u.depthTo,   bh);
+        const top = Math.min(uy1, uy2), bot = Math.max(uy1, uy2);
+        if (bot < topY2 || top > bottomY2) return;
+        const bx = x - 10;
+        ctx.save();
+        ctx.strokeStyle = u.color || '#397b88';
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(bx + 4, top); ctx.lineTo(bx, top);
+        ctx.lineTo(bx, bot); ctx.lineTo(bx + 4, bot);
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(bx - 4, (top + bot) / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.font = '600 8px "JetBrains Mono"';
+        ctx.fillStyle = u.color || '#397b88';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(u.label || '', 0, 0);
+        ctx.restore();
         ctx.restore();
       });
     }
 
-    // Markers
-    if (showMarkers) {
+    // Markers — tick/dot/leader-line and text label are independently
+    // toggleable now.
+    if (showMarkerTicks || showMarkerText) {
       bh.layers.forEach(l => {
         l.markers.forEach(m => {
           const my = depthToY(m.depth, bh);
-          ctx.save();
-          ctx.strokeStyle = '#c8783a'; ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.moveTo(x-6, my); ctx.lineTo(x+bhColW+6, my); ctx.stroke();
-          ctx.fillStyle = '#c8783a';
-          ctx.beginPath(); ctx.arc(x-4, my, 3, 0, Math.PI*2); ctx.fill();
-          ctx.font = '500 8px "JetBrains Mono"'; ctx.textAlign = 'left';
-          ctx.fillText(m.label, x + bhColW + 10, my + 3);
-          ctx.restore();
+          if (showMarkerTicks) {
+            ctx.save();
+            ctx.strokeStyle = '#c8783a'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(x-6, my); ctx.lineTo(x+bhColW+6, my); ctx.stroke();
+            ctx.fillStyle = '#c8783a';
+            ctx.beginPath(); ctx.arc(x-4, my, 3, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+          }
+          if (showMarkerText) {
+            rightLabelItems.push({
+              y: my, trueY: my, tickX: x + bhColW + 10,
+              text: m.label, font: `500 ${8 * fontScaleAnnotate}px "JetBrains Mono"`, color: '#c8783a', leaderColor: 'rgba(200,120,58,.5)'
+            });
+          }
         });
       });
+    }
+
+    // ── Draw all the collected right-hand text together, spaced apart ──
+    // Structural marks (ticks/dots/boxes) were already drawn above at
+    // their true depth; only the text positions get nudged here, each
+    // gaining a short leader line back to its true depth when it moved.
+    if (rightLabelItems.length) {
+      const resolvedY = resolveLabelPositions(rightLabelItems, 10);
+      ctx.save();
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      rightLabelItems.forEach((item, i) => {
+        const ry = resolvedY[i];
+        if (Math.abs(ry - item.trueY) > 2.5) {
+          ctx.strokeStyle = item.leaderColor; ctx.lineWidth = .6;
+          ctx.setLineDash([1.5, 1.5]);
+          ctx.beginPath(); ctx.moveTo(item.tickX, item.trueY); ctx.lineTo(item.tickX, ry); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        ctx.font = item.font;
+        ctx.fillStyle = item.color;
+        ctx.fillText(item.text, item.tickX, ry);
+      });
+      ctx.restore();
     }
 
     // Borehole ID label — sits BELOW the separator line, above the core column.
@@ -2580,31 +3937,40 @@ function draw(_targetCtx, _scale, _mode) {
     ctx.textAlign = 'center';
 
     // core ID: 40px above core top (below the separator line at PAD_TOP-68)
-    ctx.font      = '700 11px "JetBrains Mono"';
+    ctx.font      = `700 ${11 * fontScaleHeader}px "JetBrains Mono"`;
     ctx.fillStyle = '#1a1a1a';
     ctx.fillText(bh.id, x + bhColW / 2, topY3 - capTop - 40);
 
     // z= elevation: 26px above core top
     if (bh.z !== null) {
-      ctx.font      = '400 9px "JetBrains Mono"';
+      ctx.font      = `400 ${9 * fontScaleHeader}px "JetBrains Mono"`;
       ctx.fillStyle = '#555555';
       ctx.fillText(`z=${bh.z.toFixed(2)}m`, x + bhColW / 2, topY3 - capTop - 26);
     }
 
     // CRS (if present): 14px above core top
     if (bh.crs) {
-      ctx.font      = '400 8px "JetBrains Mono"';
+      ctx.font      = `400 ${8 * fontScaleHeader}px "JetBrains Mono"`;
       ctx.fillStyle = '#777777';
       ctx.fillText(bh.crs, x + bhColW / 2, topY3 - capTop - 14);
     }
 
     ctx.restore();
 
-    // Bottom coordinate label
-    const botY = depthToY(globalMaxDepth, bh);
+    // Bottom coordinate label (+ optional total logged depth just below it)
+    // — anchored to THIS core's own bottom depth, not the transect-wide
+    // deepest core, so a shallower core's label sits right under it
+    // instead of floating far below to match a deeper neighbour.
+    const botY = depthToY(bhMaxDepth, bh);
     ctx.save();
-    ctx.fillStyle = '#555555'; ctx.font = '400 8px "JetBrains Mono"'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#555555'; ctx.font = `400 ${8 * fontScaleHeader}px "JetBrains Mono"`; ctx.textAlign = 'center';
     ctx.fillText(`E:${bh.x.toFixed(0)} N:${bh.y.toFixed(0)}`, x + bhColW/2, botY + 18);
+    if (showTotalDepth && bh.layers.length) {
+      const totalM = bh.layers[bh.layers.length - 1].depthTo - bh.layers[0].depthFrom;
+      ctx.font = `600 ${8 * fontScaleHeader}px "JetBrains Mono"`;
+      ctx.fillStyle = '#397b88';
+      ctx.fillText(`Total: ${totalM.toFixed(2)} m`, x + bhColW/2, botY + 31);
+    }
     ctx.restore();
   });
 
@@ -2618,7 +3984,7 @@ function draw(_targetCtx, _scale, _mode) {
     ctx.beginPath(); ctx.moveTo(sbX+4, sbY); ctx.lineTo(sbX+4, sbY+sbPx); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(sbX, sbY); ctx.lineTo(sbX+8, sbY); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(sbX, sbY+sbPx); ctx.lineTo(sbX+8, sbY+sbPx); ctx.stroke();
-    ctx.fillStyle = '#333333'; ctx.font = '600 8px "JetBrains Mono"'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#333333'; ctx.font = `600 ${8 * fontScaleAxis}px "JetBrains Mono"`; ctx.textAlign = 'center';
     ctx.fillText(`${sbM}m`, sbX+4, sbY+sbPx+12);
   }
 
@@ -2631,15 +3997,25 @@ function draw(_targetCtx, _scale, _mode) {
   //   core column top  at PAD_TOP
   const dirLabels = { N:'Looking North →E', S:'Looking South →W', W:'Looking West →S', E:'Looking East →N' };
   ctx.fillStyle = '#444444';
-  ctx.font = '600 10px "JetBrains Mono"';
+  ctx.font = `600 ${10 * fontScaleAxis}px "JetBrains Mono"`;
   ctx.textAlign = 'left';
   ctx.fillText(dirLabels[perspective] || '', PAD_LEFT, PAD_TOP - 80);
 
   ctx.strokeStyle = '#aaaaaa'; ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(PAD_LEFT, PAD_TOP - 68);
-  ctx.lineTo(canvas.width - PAD_RIGHT/2, PAD_TOP - 68);
+  ctx.lineTo(paper.w - PAD_RIGHT/2, PAD_TOP - 68);
   ctx.stroke();
+
+  // ── Detailed legend, baked into the page — either appended below the
+  // plot (auto) or floating at a draggable position (manual) ──
+  if (legendData) {
+    drawLegendBlock(ctx, legendData, legendX, legendY, legendBlockW, legendPosMode === 'manual', !_targetCtx);
+    if (!_targetCtx) lastLegendBBox = { x: legendX, y: legendY, w: legendBlockW, h: legendBlockH };
+  } else if (!_targetCtx) {
+    lastLegendBBox = null;
+    lastLegendRows = [];
+  }
 
   updateInfo(ordered);
   buildLegend(ordered);
@@ -2647,25 +4023,313 @@ function draw(_targetCtx, _scale, _mode) {
 
 // ═══════════════════════════════════════════════════════════
 //  LEGEND
+//  Two responsibilities that share one data model:
+//   1. collectLegendItems() gathers the unique lithology fill codes/colours
+//      and manual correlation bands currently on the transect.
+//   2. buildLegend() renders an EDITABLE list in the sidebar (free-text
+//      notes per unit, editable correlation labels) — this is the source
+//      of truth for legendNotes / conn.label / conn.note.
+//   3. measureLegendHeight() / drawLegendBlock() render the same data,
+//      read-only, directly onto the canvas so it is included in exports.
 // ═══════════════════════════════════════════════════════════
-function buildLegend(ordered) {
-  const legendEl = document.getElementById('legendItems');
-  legendEl.innerHTML = '';
+function collectLegendItems(ordered) {
   const seen = new Map();
   ordered.forEach(bh => {
     bh.layers.forEach(l => {
-      const dc = displayCode(l) || l.officialDesc;
-      const key = dc + '|' + l.color;
-      if (!seen.has(key)) seen.set(key, { label: dc, color: l.color });
+      const code = displayCode(l) || l.officialDesc || '(unclassified)';
+      if (!seen.has(code)) seen.set(code, { code, color: l.color, disturbed: false, missing: false });
+      const entry = seen.get(code);
+      if (l.layerType === 'disturbed') entry.disturbed = true;
+      if (l.layerType === 'missing') entry.missing = true;
     });
   });
-  seen.forEach(({label, color}) => {
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = `<div class="legend-swatch" style="background:${color}"></div>${label}`;
-    legendEl.appendChild(item);
-  });
+  const fillItems = legendIncludeFill ? [...seen.values()].sort((a, b) => a.code.localeCompare(b.code)) : [];
+
+  const corrItems = legendIncludeCorr ? manualConnections.map((conn, idx) => {
+    const defaultLabel = conn.sides
+      .map(side => boreholes.find(b => b._uid === side.bhUid)?.id ?? '?')
+      .join(' ↔ ');
+
+    // Auto-detect which lithology classifications this band actually
+    // connects, by reading the codes of every selected layer on every
+    // side — so the legend doesn't rely on the person re-typing them.
+    const codesSeen = new Map();
+    conn.sides.forEach(side => {
+      const bh = boreholes.find(b => b._uid === side.bhUid);
+      if (!bh) return;
+      side.layerIndices.forEach(li => {
+        const l = bh.layers[li];
+        if (!l) return;
+        const code = displayCode(l) || l.officialDesc || '(unclassified)';
+        if (!codesSeen.has(code)) codesSeen.set(code, true);
+      });
+    });
+
+    const hasCustomLabel = !!(conn.label && conn.label.trim());
+    return {
+      idx,
+      color: conn.color || '#888888',
+      label: hasCustomLabel ? conn.label : defaultLabel,
+      hasCustomLabel,
+      defaultLabel,
+      note: conn.note || '',
+      codes: [...codesSeen.keys()],
+    };
+  }) : [];
+
+  return { fillItems, corrItems };
 }
+
+// Correlation legend rows lead with the auto-detected connected
+// classifications (e.g. "fS(h,u) ↔ fS(h)"), optionally prefixed by a
+// custom label and suffixed by a free-text note — mirroring the
+// "note, code" convention used for core-description rows, but built from
+// data the person doesn't have to re-enter by hand.
+function corrLegendText(item) {
+  const codesText = (item.codes && item.codes.length) ? item.codes.join(' ↔ ') : '';
+  const notePart = (item.note || '').trim().replace(/[.,]+$/, '');
+  let text = item.hasCustomLabel ? item.label : '';
+  if (codesText) text = text ? `${text} — ${codesText}` : codesText;
+  if (notePart) text = text ? `${text}: ${notePart}` : notePart;
+  return text || item.label || 'Correlation';
+}
+
+// Base legend dimensions at legendScale = 1; every row/swatch/font size
+// scales together from the "Size" slider in the Legend panel.
+function getLegendCfg() {
+  const s = legendScale;
+  return {
+    headerH: 26 * s, subheadH: 18 * s, swatch: 56 * s, swatchH: 42 * s, rowGap: 16 * s, lineH: 14 * s,
+    textFont: `700 ${11 * s}px "JetBrains Mono"`,
+    headFont: `700 ${14 * s}px "JetBrains Mono"`,
+    subFont:  `700 ${9 * s}px "JetBrains Mono"`,
+  };
+}
+
+// Combines a unit's code with its free-text note into one line, the way a
+// hand-drawn field legend reads them: "<description>, <code>". Falls back
+// to the bare code when there's no note yet.
+function legendEntryText(code, note) {
+  const n = (note || '').trim().replace(/[.,]+$/, '');
+  return n ? `${n}, ${code}` : code;
+}
+
+// Shared layout pass used by both the measurer and the drawer so the two
+// never disagree about how much vertical space the legend needs. Single
+// column, swatch + one combined bold (possibly multi-line) text block per
+// row — matches the reference field-legend style rather than a compact
+// code/note table.
+function layoutLegend(legendData, availW) {
+  const cfg = getLegendCfg();
+  const rows = [];
+  let y = cfg.headerH;
+  const textX = cfg.swatch + 14;
+  const textW = Math.max(availW - textX, 80);
+
+  if (legendData.fillItems.length) {
+    y += cfg.subheadH;
+    legendData.fillItems.forEach(item => {
+      const lines = wrapTextLines(legendEntryText(item.code, legendNotes[item.code]), cfg.textFont, textW);
+      const rowH = Math.max(cfg.swatchH, lines.length * cfg.lineH);
+      rows.push({ type: 'fill', item, lines, x: 0, y, w: availW, rowH });
+      y += rowH + cfg.rowGap;
+    });
+  }
+
+  if (legendData.corrItems.length) {
+    y += cfg.subheadH;
+    legendData.corrItems.forEach(item => {
+      const lines = wrapTextLines(corrLegendText(item), cfg.textFont, textW);
+      const rowH = Math.max(cfg.swatchH, lines.length * cfg.lineH);
+      rows.push({ type: 'corr', item, lines, x: 0, y, w: availW, rowH });
+      y += rowH + cfg.rowGap;
+    });
+  }
+
+  return { rows, totalH: y + 4 };
+}
+
+function measureLegendHeight(legendData, availW) {
+  return layoutLegend(legendData, Math.max(availW, 180)).totalH;
+}
+
+function drawLegendBlock(ctx, legendData, x, y0, w, asCard, recordRows) {
+  const cfg = getLegendCfg();
+  const { rows, totalH } = layoutLegend(legendData, w);
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  // Manual/draggable mode renders as a floating card (background + border
+  // + a small drag-handle glyph) so it reads as a movable object on the
+  // page rather than part of the fixed plot layout.
+  if (asCard) {
+    const pad = 10;
+    ctx.fillStyle = 'rgba(255,255,255,.94)';
+    ctx.strokeStyle = 'rgba(120,100,70,.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.rect(x - pad, y0 - pad - 4, w + pad * 2, totalH + pad * 2 + 4);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#b3a583';
+    ctx.font = '700 9px "JetBrains Mono"';
+    ctx.textAlign = 'right';
+    ctx.fillText('⠿', x + w + pad - 2, y0 - pad + 6);
+    ctx.textAlign = 'left';
+  }
+
+  // Panel header + separator
+  ctx.fillStyle = '#3a3428';
+  ctx.font = cfg.headFont;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('Legend', x, y0 + 14);
+  ctx.strokeStyle = '#c8bda0';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x, y0 + 20); ctx.lineTo(x + w, y0 + 20); ctx.stroke();
+
+  // Sub-headers, placed just above the first row of each section
+  const firstFill = rows.find(r => r.type === 'fill');
+  if (firstFill) {
+    ctx.fillStyle = '#8a7a5c';
+    ctx.font = cfg.subFont;
+    ctx.fillText('CORE DESCRIPTIONS', x, y0 + firstFill.y - 6);
+  }
+  const firstCorr = rows.find(r => r.type === 'corr');
+  if (firstCorr) {
+    ctx.fillStyle = '#8a7a5c';
+    ctx.font = cfg.subFont;
+    ctx.fillText('CORRELATION BANDS', x, y0 + firstCorr.y - 6);
+  }
+
+  ctx.textBaseline = 'top';
+  ctx.font = cfg.textFont;
+  if (recordRows) lastLegendRows = [];
+  rows.forEach(r => {
+    const rx = x + r.x, ry = y0 + r.y;
+    const textTop = ry + Math.max(0, (r.rowH - r.lines.length * cfg.lineH) / 2);
+    if (recordRows) {
+      lastLegendRows.push({
+        x: rx, y: ry, w: r.w, h: r.rowH,
+        type: r.type,
+        code: r.type === 'fill' ? r.item.code : null,
+        connIdx: r.type === 'corr' ? r.item.idx : null,
+      });
+    }
+    if (r.type === 'fill') {
+      ctx.fillStyle = r.item.color;
+      ctx.strokeStyle = 'rgba(0,0,0,.3)';
+      ctx.lineWidth = 1;
+      ctx.fillRect(rx, ry, cfg.swatch, cfg.swatchH);
+      // Heterogeneous/reworked units get a horizontal-hatch overlay in the
+      // swatch — a cleaner, print-friendly rendition of the same
+      // "disturbed" pattern used on the plot itself, so the legend key
+      // reads as a texture rather than a flat colour where that matters.
+      if (r.item.disturbed && (document.getElementById('showDisturbedHatch')?.checked ?? true)) {
+        ctx.save();
+        ctx.beginPath(); ctx.rect(rx, ry, cfg.swatch, cfg.swatchH); ctx.clip();
+        ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.lineWidth = 1;
+        for (let hy = ry + 4; hy < ry + cfg.swatchH; hy += 5) {
+          ctx.beginPath(); ctx.moveTo(rx, hy); ctx.lineTo(rx + cfg.swatch, hy); ctx.stroke();
+        }
+        ctx.restore();
+      }
+      if (r.item.missing) {
+        ctx.save();
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = 'rgba(150,50,50,.6)';
+        ctx.strokeRect(rx + 1, ry + 1, cfg.swatch - 2, cfg.swatchH - 2);
+        ctx.restore();
+      }
+      ctx.strokeRect(rx, ry, cfg.swatch, cfg.swatchH);
+    } else if (r.type === 'corr') {
+      // Translucent band fill + dashed top/bottom, matching the actual
+      // correlation-band rendering style used on the plot.
+      ctx.fillStyle = hexToRgba(r.item.color, 0.28);
+      ctx.fillRect(rx, ry, cfg.swatch, cfg.swatchH);
+      ctx.strokeStyle = hexToRgba(r.item.color, 0.85);
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 2]);
+      ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx + cfg.swatch, ry); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx, ry + cfg.swatchH); ctx.lineTo(rx + cfg.swatch, ry + cfg.swatchH); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.fillStyle = '#2c2718';
+    ctx.font = cfg.textFont;
+    r.lines.forEach((line, li) => {
+      ctx.fillText(line, rx + cfg.swatch + 14, textTop + li * cfg.lineH);
+    });
+  });
+
+  ctx.restore();
+}
+
+// ── Sidebar: editable legend list (source of truth for notes/labels) ──
+function buildLegend(ordered) {
+  const legendEl = document.getElementById('legendItems');
+  legendEl.innerHTML = '';
+  const { fillItems, corrItems } = collectLegendItems(ordered);
+
+  if (!fillItems.length && !corrItems.length) {
+    legendEl.innerHTML = '<div class="legend-edit-empty">No data loaded yet.</div>';
+    return;
+  }
+
+  if (fillItems.length) {
+    const sub = document.createElement('div');
+    sub.className = 'legend-edit-subhead';
+    sub.textContent = 'Core descriptions';
+    legendEl.appendChild(sub);
+
+    fillItems.forEach(({ code, color }) => {
+      const row = document.createElement('div');
+      row.className = 'legend-edit-row';
+      row.innerHTML = `
+        <div class="legend-edit-swatch" style="background:${color}"></div>
+        <div class="legend-edit-body">
+          <div class="legend-edit-code">${code}</div>
+          <textarea class="legend-edit-note" placeholder="Add a description for this unit…">${legendNotes[code] || ''}</textarea>
+        </div>`;
+      const ta = row.querySelector('textarea');
+      ta.addEventListener('input', () => {
+        legendNotes[code] = ta.value;
+        if (showLegendOnCanvas) draw();
+      });
+      legendEl.appendChild(row);
+    });
+  }
+
+  if (corrItems.length) {
+    const sub = document.createElement('div');
+    sub.className = 'legend-edit-subhead';
+    sub.textContent = 'Correlation bands';
+    legendEl.appendChild(sub);
+
+    corrItems.forEach(({ idx, color, label, defaultLabel, note }) => {
+      const row = document.createElement('div');
+      row.className = 'legend-edit-row';
+      row.innerHTML = `
+        <div class="legend-edit-swatch" style="background:${color}"></div>
+        <div class="legend-edit-body">
+          <input type="text" class="legend-edit-label-input" value="${label}" placeholder="${defaultLabel}">
+          <textarea class="legend-edit-note" placeholder="Describe the correlated horizon…">${note}</textarea>
+        </div>`;
+      const labelInp = row.querySelector('.legend-edit-label-input');
+      const ta = row.querySelector('textarea');
+      labelInp.addEventListener('input', () => {
+        manualConnections[idx].label = labelInp.value;
+        if (showLegendOnCanvas) draw();
+      });
+      ta.addEventListener('input', () => {
+        manualConnections[idx].note = ta.value;
+        if (showLegendOnCanvas) draw();
+      });
+      legendEl.appendChild(row);
+    });
+  }
+}
+
 
 // ═══════════════════════════════════════════════════════════
 //  INFO BAR
@@ -2695,7 +4359,7 @@ function getExportDPI() {
 
 // Render the whole scene to a hi-DPI offscreen canvas. `suppressText` omits
 // text so it can be supplied as crisp vector instead (used for SVG export).
-function renderRaster(scale, suppressText) {
+function renderRaster(scale, suppressText, transparentBg) {
   const off = document.createElement('canvas');
   const realCtx = off.getContext('2d');
   let target = realCtx;
@@ -2709,7 +4373,7 @@ function renderRaster(scale, suppressText) {
       set(t, p, v) { t[p] = v; return true; }
     });
   }
-  draw(target, scale);
+  draw(target, scale, undefined, transparentBg);
   return off;
 }
 
@@ -2790,14 +4454,17 @@ function exportAs(fmt) {
   const dpi   = getExportDPI();
   const scale = dpi / 96;
   const stamp = `${dpi}dpi-${Date.now()}`;
+  // Transparency only makes sense for PNG/SVG — JPG has no alpha channel.
+  const wantTransparent = document.getElementById('exportTransparentBg')?.checked ?? false;
+  const transparentBg   = fmt !== 'jpg' && wantTransparent;
 
   if (fmt === 'svg') {
     // Hi-DPI raster carries fills + textures (no text); vector layer carries
     // crisp text + outlines on top.
-    const raster = renderRaster(scale, true);
+    const raster = renderRaster(scale, true, transparentBg);
     const dataURL = raster.toDataURL('image/png');
     const rec = makeSVGRecorder(scale);
-    draw(rec, scale, 'rec');
+    draw(rec, scale, 'rec', transparentBg);
     const W = raster.width, H = raster.height;
     const svgStr =
 `<?xml version="1.0" encoding="UTF-8"?>
@@ -2813,13 +4480,13 @@ ${rec._svgBody()}
   }
 
   // PNG / JPG at chosen DPI (flat raster, text baked in)
-  const raster = renderRaster(scale, false);
+  const raster = renderRaster(scale, false, transparentBg);
   if (fmt === 'jpg') {
-    // flatten onto white
+    // JPG has no alpha channel — flatten onto the chosen canvas background.
     const flat = document.createElement('canvas');
     flat.width = raster.width; flat.height = raster.height;
     const fctx = flat.getContext('2d');
-    fctx.fillStyle = '#ffffff'; fctx.fillRect(0,0,flat.width,flat.height);
+    fctx.fillStyle = canvasBgColor; fctx.fillRect(0,0,flat.width,flat.height);
     fctx.drawImage(raster, 0, 0);
     flat.toBlob(b => triggerDL(b, `transect-${stamp}.jpg`), 'image/jpeg', .93);
   } else {
@@ -2861,9 +4528,9 @@ canvas.addEventListener('mousemove', e => {
     if (hasElev && bh.z !== null) globalMaxElev = Math.max(globalMaxElev, bh.z);
   });
 
-  const depthRange = hasElev
+  const depthRange = (hasElev
     ? (globalMaxElev - (ordered.reduce((mn,b) => b.z!==null ? Math.min(mn, b.z - globalMaxDepth) : mn, Infinity)))
-    : (globalMaxDepth - globalMinDepth || 1);
+    : (globalMaxDepth - globalMinDepth)) || 1;
 
   const paper = getPaperPx();
   const availH = paper.h - PAD_TOP - PAD_BOTTOM - offset3D;
@@ -2913,6 +4580,231 @@ canvas.addEventListener('mouseleave', () => {
 });
 
 // ═══════════════════════════════════════════════════════════
+//  LEGEND DRAG (manual position mode)
+// ═══════════════════════════════════════════════════════════
+// Converts a mouse event to logical/paper-space coordinates — valid
+// because the on-screen canvas always renders at scale=1, so canvas.width
+// equals the logical paper width (see draw()).
+function eventToLogicalXY(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width  / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
+function pointInLegendBBox(mx, my) {
+  if (!lastLegendBBox) return false;
+  const pad = 10; // matches the card's outward padding in drawLegendBlock
+  return mx >= lastLegendBBox.x - pad && mx <= lastLegendBBox.x + lastLegendBBox.w + pad &&
+         my >= lastLegendBBox.y - pad && my <= lastLegendBBox.y + lastLegendBBox.h + pad;
+}
+canvas.addEventListener('mousedown', e => {
+  if (!showLegendOnCanvas || legendPosMode !== 'manual') return;
+  const { x: mx, y: my } = eventToLogicalXY(e);
+  if (!pointInLegendBBox(mx, my)) return;
+  legendDrag = {
+    offsetX: mx - lastLegendBBox.x, offsetY: my - lastLegendBBox.y,
+    startClientX: e.clientX, startClientY: e.clientY, moved: false
+  };
+  tooltip.style.display = 'none';
+  e.preventDefault();
+});
+window.addEventListener('mousemove', e => {
+  if (!legendDrag) return;
+  if (!legendDrag.moved) {
+    const d = Math.hypot(e.clientX - legendDrag.startClientX, e.clientY - legendDrag.startClientY);
+    if (d < 4) return;   // below the drag threshold — still might just be a click
+    legendDrag.moved = true;
+    canvas.style.cursor = 'grabbing';
+  }
+  const { x: mx, y: my } = eventToLogicalXY(e);
+  legendPos = { x: mx - legendDrag.offsetX, y: my - legendDrag.offsetY };
+  draw();
+});
+window.addEventListener('mouseup', () => {
+  if (!legendDrag) return;
+  const wasDrag = legendDrag.moved;
+  legendDrag = null;
+  canvas.style.cursor = '';
+  if (wasDrag) {
+    justDraggedLegend = true;
+    setTimeout(() => { justDraggedLegend = false; }, 0);
+  }
+});
+canvas.addEventListener('mousemove', e => {
+  if (legendDrag || !showLegendOnCanvas || legendPosMode !== 'manual') return;
+  const { x: mx, y: my } = eventToLogicalXY(e);
+  canvas.style.cursor = pointInLegendBBox(mx, my) ? 'grab' : '';
+});
+
+// ═══════════════════════════════════════════════════════════
+//  EDIT LEGEND DIRECTLY ON THE CANVAS
+//  Click any legend row (baked-into-canvas legend, auto or manual
+//  position) and a small floating editor appears right over it — the
+//  same underlying data (legendNotes / manualConnections label+note) as
+//  the sidebar panel, just editable from the canvas too.
+// ═══════════════════════════════════════════════════════════
+function findLegendRowAt(mx, my) {
+  for (const row of lastLegendRows) {
+    if (mx >= row.x && mx <= row.x + row.w && my >= row.y - 4 && my <= row.y + row.h + 4) return row;
+  }
+  return null;
+}
+let activeLegendEditRow = null;
+function openCanvasLegendEditor(row, clientX, clientY) {
+  activeLegendEditRow = row;
+  const box = document.getElementById('canvasLegendEditor');
+  const labelInp = document.getElementById('canvasLegendEditorLabel');
+  const noteInp  = document.getElementById('canvasLegendEditorNote');
+
+  if (row.type === 'fill') {
+    labelInp.style.display = 'none';
+    noteInp.value = legendNotes[row.code] || '';
+    noteInp.placeholder = 'Description for ' + row.code + '…';
+  } else {
+    const conn = manualConnections[row.connIdx];
+    if (!conn) return;
+    labelInp.style.display = 'block';
+    labelInp.value = conn.label || '';
+    labelInp.placeholder = 'Label (optional)';
+    noteInp.value = conn.note || '';
+    noteInp.placeholder = 'Description of the correlation…';
+  }
+
+  box.style.display = 'block';
+  // Position near the click, nudged to stay within the viewport.
+  const boxW = 260, boxH = row.type === 'fill' ? 110 : 140;
+  let left = clientX + 12, top = clientY + 12;
+  if (left + boxW > window.innerWidth) left = window.innerWidth - boxW - 12;
+  if (top + boxH > window.innerHeight) top = window.innerHeight - boxH - 12;
+  box.style.left = Math.max(8, left) + 'px';
+  box.style.top = Math.max(8, top) + 'px';
+  box.style.width = boxW + 'px';
+
+  (row.type === 'fill' ? noteInp : labelInp).focus();
+}
+function commitCanvasLegendEditor() {
+  if (!activeLegendEditRow) return;
+  const row = activeLegendEditRow;
+  const labelInp = document.getElementById('canvasLegendEditorLabel');
+  const noteInp  = document.getElementById('canvasLegendEditorNote');
+  if (row.type === 'fill') {
+    legendNotes[row.code] = noteInp.value;
+  } else {
+    const conn = manualConnections[row.connIdx];
+    if (conn) { conn.label = labelInp.value; conn.note = noteInp.value; }
+  }
+  activeLegendEditRow = null;
+  document.getElementById('canvasLegendEditor').style.display = 'none';
+  draw();
+}
+document.getElementById('canvasLegendEditorDone').addEventListener('click', commitCanvasLegendEditor);
+document.getElementById('canvasLegendEditor').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { activeLegendEditRow = null; document.getElementById('canvasLegendEditor').style.display = 'none'; }
+});
+// Commit + close when clicking anywhere outside the editor
+document.addEventListener('mousedown', e => {
+  const box = document.getElementById('canvasLegendEditor');
+  if (box.style.display === 'none') return;
+  if (box.contains(e.target)) return;
+  commitCanvasLegendEditor();
+});
+
+// Registered before the correlation-mode click handler below, and calls
+// stopImmediatePropagation() when it handles a legend row — so clicking a
+// legend row never also toggles a correlation-mode layer selection
+// underneath it.
+canvas.addEventListener('click', e => {
+  if (!showLegendOnCanvas || !lastLegendRows.length) return;
+  if (justDraggedLegend || justPanned) return;
+  const { x: mx, y: my } = eventToLogicalXY(e);
+  const row = findLegendRowAt(mx, my);
+  if (!row) return;
+  openCanvasLegendEditor(row, e.clientX, e.clientY);
+  e.stopImmediatePropagation();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CANVAS VIEW: PAN (drag) + ZOOM (wheel)
+//  Purely a CSS transform on a wrapper around the canvas — the canvas's
+//  own width/height (and therefore every exported file) always stays tied
+//  to the paper format settings, completely unaffected by how the view is
+//  panned or zoomed on screen.
+// ═══════════════════════════════════════════════════════════
+let viewZoom = 1, viewPanX = 0, viewPanY = 0;
+let panDrag = null;       // { startX, startY, startPanX, startPanY, moved }
+let justPanned = false;   // true for one tick after a real pan drag ends, to swallow the trailing click
+
+const canvasScrollEl   = document.getElementById('canvasScroll');
+const canvasViewportEl = document.getElementById('canvasViewport');
+const zoomInfoEl       = document.getElementById('zoomInfo');
+
+function applyViewTransform() {
+  canvasViewportEl.style.transform = `translate(${viewPanX}px, ${viewPanY}px) scale(${viewZoom})`;
+  if (zoomInfoEl) zoomInfoEl.textContent = Math.round(viewZoom * 100) + '%';
+}
+// "Reset View" — back to exactly what the paper format settings produce:
+// 100% zoom, top-left aligned (no pan offset beyond the viewport's own
+// padding). Does not touch paper size/orientation/DPI themselves.
+function resetView() {
+  viewZoom = 1; viewPanX = 0; viewPanY = 0;
+  applyViewTransform();
+}
+resetView();
+
+canvasScrollEl.addEventListener('wheel', e => {
+  if (!boreholes.length) return;
+  e.preventDefault();
+  const rect = canvasScrollEl.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const oldZoom = viewZoom;
+  const factor = Math.exp(-e.deltaY * 0.0015);
+  const newZoom = Math.max(0.1, Math.min(8, oldZoom * factor));
+  // Keep the point under the cursor stationary while zooming.
+  const contentX = (mx - viewPanX) / oldZoom;
+  const contentY = (my - viewPanY) / oldZoom;
+  viewPanX = mx - contentX * newZoom;
+  viewPanY = my - contentY * newZoom;
+  viewZoom = newZoom;
+  applyViewTransform();
+}, { passive: false });
+
+// Drag-to-pan. Registered on the scroll container so it also catches drags
+// that start on the canvas itself (the mousedown bubbles up) — but only
+// actually engages once the mouse has moved a few pixels, so a plain click
+// still works normally elsewhere (e.g. selecting a layer in correlation
+// mode, or the legend-drag handler above, which runs first and claims the
+// event by setting legendDrag before this one checks it).
+canvasScrollEl.addEventListener('mousedown', e => {
+  if (legendDrag) return;
+  panDrag = { startX: e.clientX, startY: e.clientY, startPanX: viewPanX, startPanY: viewPanY, moved: false };
+});
+window.addEventListener('mousemove', e => {
+  if (!panDrag) return;
+  const dx = e.clientX - panDrag.startX;
+  const dy = e.clientY - panDrag.startY;
+  if (!panDrag.moved && Math.hypot(dx, dy) > 4) {
+    panDrag.moved = true;
+    canvasScrollEl.classList.add('panning');
+    tooltip.style.display = 'none';
+  }
+  if (panDrag.moved) {
+    viewPanX = panDrag.startPanX + dx;
+    viewPanY = panDrag.startPanY + dy;
+    applyViewTransform();
+  }
+});
+window.addEventListener('mouseup', () => {
+  if (!panDrag) return;
+  if (panDrag.moved) {
+    justPanned = true;
+    setTimeout(() => { justPanned = false; }, 0);
+    canvasScrollEl.classList.remove('panning');
+  }
+  panDrag = null;
+});
+document.getElementById('btnResetView').addEventListener('click', resetView);
+
+// ═══════════════════════════════════════════════════════════
 //  CONTROLS WIRING
 // ═══════════════════════════════════════════════════════════
 
@@ -2933,6 +4825,7 @@ document.getElementById('paperSizeRow').addEventListener('click', e => {
   document.querySelectorAll('#paperSizeRow .btn-seg').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   paperSize = btn.dataset.size;
+  document.getElementById('customPaperGroup').style.display = paperSize === 'Custom' ? 'block' : 'none';
   draw();
 });
 
@@ -2970,9 +4863,120 @@ document.getElementById('depthRange').addEventListener('input', e => {
   draw();
 });
 
+// Height-indicator (axis tick interval) overrides
+document.getElementById('depthTickStep').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  depthTickStep = (isFinite(v) && v > 0) ? v : 0;
+  draw();
+});
+document.getElementById('elevTickStep').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  elevTickStep = (isFinite(v) && v > 0) ? v : 0;
+  draw();
+});
+
+// Typography scale sliders
+function wireFontScaleSlider(id, setter) {
+  document.getElementById(id).addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    setter(v);
+    document.getElementById(id + 'Val').textContent = '×' + v.toFixed(2);
+    draw();
+  });
+}
+wireFontScaleSlider('fontScaleHeader',   v => fontScaleHeader = v);
+wireFontScaleSlider('fontScaleAxis',     v => fontScaleAxis = v);
+wireFontScaleSlider('fontScaleLabels',   v => fontScaleLabels = v);
+wireFontScaleSlider('fontScaleAnnotate', v => fontScaleAnnotate = v);
+
+// Legend size scale
+document.getElementById('legendScale').addEventListener('input', e => {
+  legendScale = parseFloat(e.target.value);
+  document.getElementById('legendScaleVal').textContent = '×' + legendScale.toFixed(2);
+  draw();
+});
+
 // Checkboxes
-['showInterpol', 'showMarkers', 'showCompaction', 'showLabels', 'showTexture', 'showDepthAxis', 'showGrid', 'showElevAlign']
-  .forEach(id => document.getElementById(id).addEventListener('change', draw));
+// NOTE: addEventListener passes the native Event as the handler's first
+// argument — wiring straight to draw(_targetCtx, ...) would hand that
+// Event object to draw() as _targetCtx, which is truthy so it bypasses the
+// `|| window.__screenCtx` fallback and then crashes on ctx.canvas being
+// undefined. Wrap so draw() always gets called with no arguments here.
+['showInterpol', 'showMarkerTicks', 'showMarkerText', 'showObservationOverlay', 'showUnits', 'showCompaction', 'showLabels', 'showTexture', 'showGrainSizeColumn', 'showBoreholeOutline', 'showLayerDepths', 'showTotalDepth', 'showDisturbedHatch', 'showTransitions', 'showDepthAxis', 'showGrid', 'showElevAlign']
+  .forEach(id => document.getElementById(id).addEventListener('change', () => draw()));
+
+document.getElementById('showPaperTexture').addEventListener('change', e => {
+  showPaperTexture = e.target.checked;
+  draw();
+});
+document.getElementById('showLegendOnCanvas').addEventListener('change', e => {
+  showLegendOnCanvas = e.target.checked;
+  document.getElementById('legendPosRow').style.display = showLegendOnCanvas ? 'flex' : 'none';
+  document.getElementById('legendSizeRow').style.display = showLegendOnCanvas ? 'flex' : 'none';
+  document.getElementById('legendManualHint').style.display = (showLegendOnCanvas && legendPosMode === 'manual') ? 'block' : 'none';
+  draw();
+});
+
+// Legend content filter — lets someone show only the correlation-band
+// section (or only core descriptions) instead of always both.
+document.getElementById('legendIncludeFill').addEventListener('change', e => {
+  legendIncludeFill = e.target.checked;
+  draw();
+});
+document.getElementById('legendIncludeCorr').addEventListener('change', e => {
+  legendIncludeCorr = e.target.checked;
+  draw();
+});
+
+// Legend position mode — auto (appended below the plot) vs manual (dragged
+// directly on the canvas). Switching to manual seeds a starting position
+// from wherever the legend last rendered, so it doesn't jump.
+document.getElementById('legendPosModeRow').addEventListener('click', e => {
+  const btn = e.target.closest('.btn-seg[data-mode]');
+  if (!btn) return;
+  document.querySelectorAll('#legendPosModeRow .btn-seg').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  legendPosMode = btn.dataset.mode;
+  document.getElementById('legendManualHint').style.display = legendPosMode === 'manual' ? 'block' : 'none';
+  document.getElementById('legendPosReset').style.display = legendPosMode === 'manual' ? 'inline-block' : 'none';
+  if (legendPosMode === 'manual' && !legendPos && lastLegendBBox) {
+    legendPos = { x: lastLegendBBox.x, y: lastLegendBBox.y };
+  }
+  draw();
+});
+document.getElementById('legendPosReset').addEventListener('click', () => {
+  legendPos = null;
+  draw();
+});
+
+// Canvas background colour
+document.getElementById('canvasBgColorPicker').addEventListener('input', e => {
+  canvasBgColor = e.target.value;
+  document.getElementById('canvasBgColorPreview').style.background = canvasBgColor;
+  draw();
+});
+
+// Margins
+function wireMarginInput(id, setter) {
+  document.getElementById(id).addEventListener('input', e => {
+    const v = parseInt(e.target.value, 10);
+    if (isFinite(v) && v >= 0) { setter(v); draw(); }
+  });
+}
+wireMarginInput('padLeftInput',   v => PAD_LEFT   = v);
+wireMarginInput('padRightInput',  v => PAD_RIGHT  = v);
+wireMarginInput('padTopInput',    v => PAD_TOP    = v);
+wireMarginInput('padBottomInput', v => PAD_BOTTOM = v);
+
+// Custom paper size inputs
+document.getElementById('customPaperW').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (isFinite(v) && v > 0) { customPaperWmm = v; draw(); }
+});
+document.getElementById('customPaperH').addEventListener('input', e => {
+  const v = parseFloat(e.target.value);
+  if (isFinite(v) && v > 0) { customPaperHmm = v; draw(); }
+});
 
 // ═══════════════════════════════════════════════════════════
 //  FILE INPUT / DRAG DROP
@@ -3015,6 +5019,7 @@ document.getElementById('btnCorrMode').addEventListener('click', () => {
 
 function updateCorrUI() {
   const status    = document.getElementById('corrStatus');
+  const anchorList = document.getElementById('corrAnchorList');
   const btnOk     = document.getElementById('btnCorrConfirm');
   const btnCancel = document.getElementById('btnCorrCancel');
   const btnClear  = document.getElementById('btnCorrClearAll');
@@ -3022,10 +5027,12 @@ function updateCorrUI() {
 
   if (!corrMode) {
     status.textContent = 'Correlation mode off.';
+    anchorList.innerHTML = '';
     btnOk.style.display = btnCancel.style.display = 'none';
     colorRow.style.display = 'none';
   } else if (pendingSelection.size === 0) {
     status.innerHTML = 'Click layers in any core to select them. You can select multiple layers per core.';
+    anchorList.innerHTML = '';
     btnOk.style.display = btnCancel.style.display = 'none';
     colorRow.style.display = 'none';
   } else {
@@ -3042,6 +5049,33 @@ function updateCorrUI() {
                        '<br>Press Connect when ready.');
     btnOk.style.display  = coreCount >= 2 ? 'block' : 'none';
     btnCancel.style.display = 'block';
+
+    // Per-core anchor selector — lets each side of the connection attach
+    // at the layer's full span, or collapse to just its top or bottom
+    // edge (a single point) to draw a pinch-out wedge instead of a band,
+    // for "may not be documented here but could continue" correlations.
+    anchorList.innerHTML = '';
+    pendingSelection.forEach((layerSet, bhUid) => {
+      const bh = boreholes.find(b => b._uid === bhUid);
+      if (!pendingAnchor.has(bhUid)) pendingAnchor.set(bhUid, 'full');
+      const current = pendingAnchor.get(bhUid);
+      const row = document.createElement('div');
+      row.className = 'corr-anchor-row';
+      row.innerHTML = `
+        <span class="corr-anchor-name" title="${bh?.id ?? '?'}">${bh?.id ?? '?'}</span>
+        <div class="corr-anchor-btns">
+          <button class="corr-anchor-btn ${current==='full'?'active':''}" data-anchor="full" title="Connect the full layer span">Full</button>
+          <button class="corr-anchor-btn ${current==='top'?'active':''}" data-anchor="top" title="Collapse to the layer's top edge (pinch-out point)">Top pt</button>
+          <button class="corr-anchor-btn ${current==='bottom'?'active':''}" data-anchor="bottom" title="Collapse to the layer's bottom edge (pinch-out point)">Bot pt</button>
+        </div>`;
+      row.querySelectorAll('.corr-anchor-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          pendingAnchor.set(bhUid, btn.dataset.anchor);
+          updateCorrUI();
+        });
+      });
+      anchorList.appendChild(row);
+    });
 
     // Show color picker when ready to connect; seed with first selected layer color
     if (coreCount >= 2) {
@@ -3078,11 +5112,12 @@ function confirmConnection() {
 
   const sides = [];
   pendingSelection.forEach((layerSet, bhUid) => {
-    sides.push({ bhUid, layerIndices: [...layerSet] });
+    sides.push({ bhUid, layerIndices: [...layerSet], anchor: pendingAnchor.get(bhUid) || 'full' });
   });
 
   manualConnections.push({ sides, color });
   pendingSelection = new Map();
+  pendingAnchor = new Map();
 
   // Reset user-set flag and color picker for next selection
   picker.dataset.userSet = '';
@@ -3096,6 +5131,7 @@ function confirmConnection() {
 
 function cancelSelection() {
   pendingSelection = new Map();
+  pendingAnchor = new Map();
   const picker = document.getElementById('corrColorPicker');
   picker.dataset.userSet = '';
   picker.value = '#888888';
@@ -3114,6 +5150,7 @@ function removeConnection(idx) {
 function clearAllConnections() {
   manualConnections.length = 0;
   pendingSelection = new Map();
+  pendingAnchor = new Map();
   updateCorrUI();
   draw();
 }
@@ -3125,17 +5162,21 @@ function renderCorrList() {
     const label = conn.sides.map(side => {
       const bh = boreholes.find(b => b._uid === side.bhUid);
       const n  = side.layerIndices.length;
-      return `${bh?.id ?? '?'} (${n}L)`;
+      const anchorTag = side.anchor === 'top' ? ' ⌃' : side.anchor === 'bottom' ? ' ⌄' : '';
+      return `${bh?.id ?? '?'} (${n}L)${anchorTag}`;
     }).join(' → ');
 
     const item = document.createElement('div');
     item.className = 'corr-conn-item';
     item.innerHTML = `
-      <div class="corr-conn-swatch" title="Click to change colour" style="background:${conn.color}">
-        <input type="color" value="${conn.color}" data-idx="${idx}">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="corr-conn-swatch" title="Click to change colour" style="background:${conn.color}">
+          <input type="color" value="${conn.color}" data-idx="${idx}">
+        </div>
+        <div class="corr-conn-label" title="${label}">${label}</div>
+        <button class="corr-conn-del" title="Remove" onclick="removeConnection(${idx})">✕</button>
       </div>
-      <div class="corr-conn-label" title="${label}">${label}</div>
-      <button class="corr-conn-del" title="Remove" onclick="removeConnection(${idx})">✕</button>`;
+      <div class="corr-conn-anchors"></div>`;
 
     // Wire the inline color picker for existing connections
     const inp = item.querySelector('input[type="color"]');
@@ -3146,6 +5187,27 @@ function renderCorrList() {
       draw();
     });
 
+    // Per-side anchor editor — cycles Full → Top pt → Bottom pt → Full on
+    // click, so a connection's pinch-out points can be adjusted after the
+    // fact without deleting and re-creating it.
+    const anchorsEl = item.querySelector('.corr-conn-anchors');
+    const ANCHOR_CYCLE = { full: 'top', top: 'bottom', bottom: 'full' };
+    const ANCHOR_LABEL = { full: 'Full', top: '⌃ Top pt', bottom: '⌄ Bot pt' };
+    conn.sides.forEach((side, si) => {
+      const bh = boreholes.find(b => b._uid === side.bhUid);
+      const pill = document.createElement('button');
+      pill.className = 'corr-conn-anchor-pill';
+      pill.title = `${bh?.id ?? '?'} — click to cycle Full / Top point / Bottom point`;
+      pill.textContent = `${bh?.id ?? '?'}: ${ANCHOR_LABEL[side.anchor || 'full']}`;
+      pill.addEventListener('click', () => {
+        const current = manualConnections[idx].sides[si].anchor || 'full';
+        manualConnections[idx].sides[si].anchor = ANCHOR_CYCLE[current];
+        renderCorrList();
+        draw();
+      });
+      anchorsEl.appendChild(pill);
+    });
+
     el.appendChild(item);
   });
 }
@@ -3153,6 +5215,8 @@ function renderCorrList() {
 // Canvas click: toggle individual layers into/out of pendingSelection
 canvas.addEventListener('click', e => {
   if (!corrMode) return;
+  if (justDraggedLegend) return; // suppress the click that follows a legend drag's mouseup
+  if (justPanned) return; // suppress the click that follows a view-pan drag's mouseup
 
   const rect   = canvas.getBoundingClientRect();
   const scaleX = canvas.width  / rect.width;
@@ -3173,9 +5237,9 @@ canvas.addEventListener('click', e => {
     if (hasElev && bh.z !== null) globalMaxElev = Math.max(globalMaxElev, bh.z);
   });
 
-  const depthRange = hasElev
+  const depthRange = (hasElev
     ? (globalMaxElev - ordered.reduce((mn, b) => b.z !== null ? Math.min(mn, b.z - globalMaxDepth) : mn, Infinity))
-    : (globalMaxDepth - globalMinDepth || 1);
+    : (globalMaxDepth - globalMinDepth)) || 1;
 
   const paper   = getPaperPx();
   const availH  = paper.h - PAD_TOP - PAD_BOTTOM - offset3D;
@@ -3212,7 +5276,7 @@ canvas.addEventListener('click', e => {
   const layerSet = pendingSelection.get(hit.bhUid);
   if (layerSet.has(hit.layerIdx)) {
     layerSet.delete(hit.layerIdx);
-    if (layerSet.size === 0) pendingSelection.delete(hit.bhUid);
+    if (layerSet.size === 0) { pendingSelection.delete(hit.bhUid); pendingAnchor.delete(hit.bhUid); }
   } else {
     layerSet.add(hit.layerIdx);
   }
@@ -3280,3 +5344,11 @@ document.getElementById('layerEditorBackdrop').addEventListener('click', e => {
 // ═══════════════════════════════════════════════════════════
 draw();
 </script>
+
+<h6 style="text-align:center;margin:0 0 4px;color:var(--muted,#5c7180);font-family:var(--ga-mono, monospace);font-size:.68rem;font-weight:400;"><small>by PLF</small></h6>
+<p style="text-align:center; margin:0 0 4px; font-size:.68rem; font-family:var(--ga-mono, monospace); color:var(--muted,#5c7180);">
+    With thanks to [Name(s)] for testing and input
+</p>
+<p style="text-align:center; margin:0 0 16px; font-size:.68rem; font-family:var(--ga-mono, monospace); color:var(--muted,#5c7180);">
+    Reference: [Author(s), Year, Title] &nbsp;·&nbsp; DOI: <a href="https://doi.org/[DOI]" target="_blank" rel="noopener" style="color:var(--ga-accent,#397b88);">https://doi.org/[DOI]</a>
+</p>
